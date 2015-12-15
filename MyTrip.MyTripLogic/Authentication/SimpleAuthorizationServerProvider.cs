@@ -30,10 +30,10 @@ namespace MyTrip.MyTripLogic.Authentication
                 context.SetError("invalid_grant", "The user name or password is incorrect.");
                 return;
             }
-
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+            identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
             identity.AddClaim(new Claim("sub", context.UserName));
-            identity.AddClaim(new Claim("role", "user"));
+            identity.AddClaim(new Claim(ClaimTypes.Role, "user"));
 
             context.Validated(identity);
         }
