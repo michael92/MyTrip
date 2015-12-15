@@ -12,8 +12,8 @@ namespace MyTrip.MyTripLogic.Repositories
         {
             return new List<Trip>()
             {
-                new Trip() {Id=Guid.NewGuid() , Name  = "Name 1"},
-                new Trip() {Id=Guid.NewGuid() , Name  = "Name 2"},
+                new Trip() {Id=Guid.NewGuid() , Date = DateTime.Now, IsPublic = true},
+                new Trip() {Id=Guid.NewGuid() , Date = DateTime.Now.AddDays(-1), IsPublic = false},
             };
         }
     }

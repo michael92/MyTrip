@@ -9,6 +9,8 @@ namespace MyTrip.MyTripLogic.Models
     {
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
+        public DateTime Date { get; set; }
+
+        public bool IsPublic { get; set; }
     }
 }
