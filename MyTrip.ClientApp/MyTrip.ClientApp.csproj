@@ -97,18 +97,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\EditPhotoAndFilmListController.cs" />
-    <Compile Include="Controllers\EditRoutePointsController.cs" />
-    <Compile Include="Controllers\GenerateTripPresentationController.cs" />
-    <Compile Include="Controllers\InsertPhotoOrFilmController.cs" />
-    <Compile Include="Controllers\InsertTripRouteController.cs" />
-    <Compile Include="Controllers\SignInController.cs" />
-    <Compile Include="Controllers\SignOutController.cs" />
-    <Compile Include="Controllers\ViewTripController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\CreateTripPosterController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
