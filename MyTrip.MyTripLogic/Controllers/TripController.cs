@@ -22,6 +22,7 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("")]
         public IHttpActionResult Get()
         {
+            var name = User.Identity.Name;
             return Ok(_repo.GetTrips());
         }
     }
