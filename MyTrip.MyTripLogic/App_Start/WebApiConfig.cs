@@ -9,9 +9,9 @@ namespace MyTrip.MyTripLogic
     {
         public static void Register(HttpConfiguration config)
         {
-            // Konfiguracja i usługi składnika Web API
+            // Web API configuration and services
 
-            // Trasy składnika Web API
+            // Web API routes
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

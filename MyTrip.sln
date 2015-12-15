@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTrip.ClientApp", "MyTrip.ClientApp\MyTrip.ClientApp.csproj", "{149BDD26-224A-4D78-8086-222F64FEBD48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTrip.MyTripLogic", "MyTrip.MyTripLogic\MyTrip.MyTripLogic.csproj", "{A82522E5-3B6D-47B5-892C-4C7304756E55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTrip.MyTripLogic", "MyTrip.MyTripLogic\MyTrip.MyTripLogic.csproj", "{852535C3-4CCC-4ACD-A5D5-91E7642189E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{149BDD26-224A-4D78-8086-222F64FEBD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{149BDD26-224A-4D78-8086-222F64FEBD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{149BDD26-224A-4D78-8086-222F64FEBD48}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A82522E5-3B6D-47B5-892C-4C7304756E55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A82522E5-3B6D-47B5-892C-4C7304756E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A82522E5-3B6D-47B5-892C-4C7304756E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A82522E5-3B6D-47B5-892C-4C7304756E55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
-namespace MyTrip.ClientApp.MyTripWebApi.EndPoints
+namespace MyTrip.MyTripLogic.Controllers
 {
     public class CreateTripPosterController : ApiController
     {
