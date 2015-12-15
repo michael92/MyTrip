@@ -25,6 +25,9 @@ namespace MyTrip.MyTripLogic.Repositories
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegistrationModel registrationModel)
         {
+            var existingUser = await FindUser(registrationModel.UserName);
+            if (existingUser != null)
+                return IdentityResult.Failed("User with this username already exists");
             UserManager<MyTripUser> manager=new UserManager<MyTripUser>(userStore);
             var user = new MyTripUser()
             {
