@@ -8,7 +8,7 @@ using MyTrip.MyTripLogic.Repositories;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
-    [RoutePrefix("api/Trips")]
+    [RoutePrefix("api/Trip")]
     [Authorize]
     public class TripController : ApiController
     {
