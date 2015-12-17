@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTrip.ClientApp", "MyTrip.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTrip.MyTripLogic", "MyTrip.MyTripLogic\MyTrip.MyTripLogic.csproj", "{852535C3-4CCC-4ACD-A5D5-91E7642189E0}"
 EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Media", "Media\Media.ccproj", "{664946AA-5008-42BC-A56A-68DC56AF8C51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaGenerator", "MediaGenerator\MediaGenerator.csproj", "{40674E67-7F50-48DD-89CE-5CEED7B5037A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaConverter", "MediaConverter\MediaConverter.csproj", "{BDDC80CC-DBCA-4C70-827F-D0D516D6D9EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +27,18 @@ Global
 		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{852535C3-4CCC-4ACD-A5D5-91E7642189E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{664946AA-5008-42BC-A56A-68DC56AF8C51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{664946AA-5008-42BC-A56A-68DC56AF8C51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{664946AA-5008-42BC-A56A-68DC56AF8C51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{664946AA-5008-42BC-A56A-68DC56AF8C51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40674E67-7F50-48DD-89CE-5CEED7B5037A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40674E67-7F50-48DD-89CE-5CEED7B5037A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40674E67-7F50-48DD-89CE-5CEED7B5037A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40674E67-7F50-48DD-89CE-5CEED7B5037A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDDC80CC-DBCA-4C70-827F-D0D516D6D9EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDDC80CC-DBCA-4C70-827F-D0D516D6D9EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDDC80CC-DBCA-4C70-827F-D0D516D6D9EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDDC80CC-DBCA-4C70-827F-D0D516D6D9EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
