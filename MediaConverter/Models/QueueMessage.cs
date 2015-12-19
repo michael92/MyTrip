@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Queue;
+using Newtonsoft.Json;
 
 namespace MediaConverter.Models
 {
@@ -15,13 +16,25 @@ namespace MediaConverter.Models
         public string url { get; set; }
 
 
-        // Tutaj trzeba ustalic z innymi jaki format będzie miał string w CloudQueueMessage
-        internal static QueueMessage ParseMessage(CloudQueueMessage msg)
+        public static QueueMessage DeserializeMessage(CloudQueueMessage msg)
         {
-            throw new NotImplementedException();
-            string unproccessedMsg = msg.AsString;
-            //TODO: zamiana stringa w obiekt QueueMessage
-            return new QueueMessage { };
+            int indexOf = msg.AsString.IndexOf(':');
+
+            if (indexOf <= 0)
+                throw new Exception(string.Format("Cannot deserialize into object of type {0}",
+                    typeof(QueueMessage).FullName));
+
+            string typeName = msg.AsString.Substring(0, indexOf);
+            string json = msg.AsString.Substring(indexOf + 1);
+
+            if (typeName != typeof(QueueMessage).FullName)
+            {
+                throw new Exception(string.Format("Cannot deserialize object of type {0} into one of type {1}",
+                    typeName,
+                    typeof(QueueMessage).FullName));
+            }
+
+            return JsonConvert.DeserializeObject<QueueMessage>(json);
         }
     }
 

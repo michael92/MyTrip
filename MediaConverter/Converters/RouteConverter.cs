@@ -1,17 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MediaConverter.Models;
+using Microsoft.Azure.Documents.Client;
+using MyTrip.MyTripLogic.DB;
+using MyTrip.MyTripLogic.Models;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MediaConverter.Models;
 
 namespace MediaConverter.Converters
 {
     public class RouteConverter : IConverter
     {
-        public object ConvertData(QueueMessage msg)
+        public void ConvertData(QueueMessage msg)
         {
-            throw new NotImplementedException();
+            //TODO: switch to repo
+            DocumentDb unfrouteDB = new DocumentDb("MyTripDb", "unformattedroute");
+            DocumentClient dc = unfrouteDB.getClient();
+            UnformattedRoute unfroute = dc.CreateDocumentQuery<UnformattedRoute>(new Uri(unfrouteDB.getCollection().SelfLink))
+                .Where(t => t.Id == msg.routeId).FirstOrDefault();
+           
+            if(unfroute != null)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

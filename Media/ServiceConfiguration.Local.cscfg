@@ -10,6 +10,7 @@
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=trassconvertqueue;AccountKey=rKT+JOudwtWVUKELuzxMdNMmAU7SlqMfTQ4H6MaE3dMYhb4WiXIyMtA4oka62E8hkc1X0sdIQXMNWX0XSO5ATw==" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

@@ -10,17 +10,12 @@ using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
-using MediaConverter.Models;
 using MediaConverter.Converters;
+using MyTrip.MyTripLogic.Models;
+using MediaConverter.Models;
 
 namespace MediaConverter
-{
-    /*
-    TODO:
-    - connectionString do bazy danych, blobów, kolejki w pliku konfiguracyjnym 
-    - ustalenie z innymi jak bêdzie dok³adnie wygl¹da³ message w kolejce 
-    - 
-    */
+{    
     public class WorkerRole : RoleEntryPoint
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -43,17 +38,15 @@ namespace MediaConverter
 
         public override bool OnStart()
         {
-            // Set the maximum number of concurrent connections
             ServicePointManager.DefaultConnectionLimit = 12;
-
-
-            // Open storage account using credentials from .cscfg file.
+            
             var storageAccount = CloudStorageAccount.Parse
-                (RoleEnvironment.GetConfigurationSettingValue("StorageConnectionString"));//TODO
+                (RoleEnvironment.GetConfigurationSettingValue("StorageConnectionString"));
 
             Trace.TraceInformation("Creating queue");
             var queueClient = storageAccount.CreateCloudQueueClient();
-            this.queue = queueClient.GetQueueReference("queue"); //TODO nazwa kolejki
+            this.queue = queueClient.GetQueueReference("converter");
+            this.queue.CreateIfNotExists();
 
             bool result = base.OnStart();
 
@@ -70,15 +63,13 @@ namespace MediaConverter
             this.runCompleteEvent.WaitOne();
 
             base.OnStop();
-
-            Trace.TraceInformation("MediaConverter has stopped");
         }
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
             CloudQueueMessage msg = null;
 
-            while (!cancellationToken.IsCancellationRequested) //czy tutaj nie powinno byæ while true?
+            while (!cancellationToken.IsCancellationRequested) 
             {
                 Trace.TraceInformation("Working");
                 try
@@ -94,7 +85,7 @@ namespace MediaConverter
                         System.Threading.Thread.Sleep(1000);
                     }
                 }
-                catch (StorageException e)
+                catch (Exception e)
                 {
                     if (msg != null && msg.DequeueCount > 5)
                     {
@@ -105,7 +96,6 @@ namespace MediaConverter
                     Trace.TraceError("Exception in MediaConverter: '{0}'", e.Message);
                     System.Threading.Thread.Sleep(5000);
                 }
-
                 await Task.Delay(1000);
             }
         }
@@ -113,9 +103,8 @@ namespace MediaConverter
 
         private void ProcessQueueMessage(CloudQueueMessage msg)
         {
-            throw new NotImplementedException();
             Trace.TraceInformation("Processing queue message {0}", msg);
-            QueueMessage parsedMsg = QueueMessage.ParseMessage(msg);
+            QueueMessage parsedMsg = QueueMessage.DeserializeMessage(msg);
 
             IConverter converter = null;
 

@@ -9,6 +9,6 @@ namespace MediaConverter.Converters
 {
     interface IConverter
     {
-        object ConvertData(QueueMessage msg);
+        void ConvertData(QueueMessage msg);
     }
 }

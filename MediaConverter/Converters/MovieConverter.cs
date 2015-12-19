@@ -9,7 +9,7 @@ namespace MediaConverter.Converters
 {
     public class MovieConverter : IConverter
     {
-        public object ConvertData(QueueMessage msg)
+        public void ConvertData(QueueMessage msg)
         {
             throw new NotImplementedException();
         }
