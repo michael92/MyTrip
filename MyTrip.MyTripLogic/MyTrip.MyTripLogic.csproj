@@ -42,6 +42,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\MyTrip.MyTripLogic.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="JF.AspNet.Identity.DocumentDB, Version=1.0.8.31635, Culture=neutral, processorArchitecture=MSIL">
