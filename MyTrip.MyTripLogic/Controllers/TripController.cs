@@ -26,6 +26,17 @@ namespace MyTrip.MyTripLogic.Controllers
             return Ok(_repo.GetTrips());
         }
 
+        [Route("/getTripInfo")]
+        public IHttpActionResult GetTrip([FromUri] int id)
+        {
+            return Ok(_repo.GetTrip(id));
+        }
+
+        [Route("/getTrip")]
+        public IHttpActionResult GetPhotosAndMovies([FromUri] int tripId)
+        {
+            return Ok(_repo.GetPhotosAndMovies(tripId));
+        }
 
     }
 }
