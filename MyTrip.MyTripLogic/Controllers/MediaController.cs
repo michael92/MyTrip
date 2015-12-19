@@ -12,6 +12,7 @@ using System.Web.Http;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
+    [RoutePrefix("api/Media")]
     public class MediaController : ApiController
     {
         private readonly MediaRepository _repo;
@@ -21,9 +22,8 @@ namespace MyTrip.MyTripLogic.Controllers
             _repo = new MediaRepository();
         }
 
-
-
         [HttpPost]
+        [Route("addPhoto")]
         public async Task<IHttpActionResult> addPhoto([FromUri] int id, [FromUri] int tripId)
         {
 
@@ -47,6 +47,7 @@ namespace MyTrip.MyTripLogic.Controllers
         }
 
         [HttpPost]
+        [Route("addMovie")]
         public async Task<IHttpActionResult> addMovie([FromUri] int id, [FromUri] int tripId)
         {
 
