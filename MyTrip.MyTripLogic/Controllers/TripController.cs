@@ -25,5 +25,7 @@ namespace MyTrip.MyTripLogic.Controllers
             var name = User.Identity.Name;
             return Ok(_repo.GetTrips());
         }
+
+
     }
 }

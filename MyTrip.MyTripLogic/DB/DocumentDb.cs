@@ -42,6 +42,21 @@ namespace MyTrip.MyTripLogic.DB
             }
         }
 
+        public DocumentClient getClient()
+        {
+            string endpoint = ConfigurationManager.AppSettings["endpoint"];
+            string authKey = ConfigurationManager.AppSettings["authKey"];
+
+            Uri endpointUri = new Uri(endpoint);
+            return new DocumentClient(endpointUri, authKey);
+
+        }
+
+        public DocumentCollection getCollection()
+        {
+            return _collection;
+        }
+
         public static string Database = "MyTripDb";
 
         protected static DocumentCollection Collection
