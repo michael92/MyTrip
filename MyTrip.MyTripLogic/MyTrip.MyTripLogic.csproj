@@ -178,6 +178,7 @@
     <Compile Include="Authentication\SimpleAuthorizationServerProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\MediaController.cs" />
+    <Compile Include="Controllers\RouteController.cs" />
     <Compile Include="Controllers\TripController.cs" />
     <Compile Include="DB\DocumentDb.cs" />
     <Compile Include="Global.asax.cs">
@@ -186,10 +187,12 @@
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\MyTripUser.cs" />
+    <Compile Include="Models\UnformattedRoute.cs" />
     <Compile Include="Models\UserRegistrationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AuthRepository.cs" />
     <Compile Include="Repositories\MediaRepository.cs" />
+    <Compile Include="Repositories\RouteRepository.cs" />
     <Compile Include="Repositories\TripRepository.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
