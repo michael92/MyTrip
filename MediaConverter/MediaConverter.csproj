@@ -75,6 +75,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\IConverter.cs" />
+    <Compile Include="Converters\MovieConverter.cs" />
+    <Compile Include="Converters\PhotoConverter.cs" />
+    <Compile Include="Converters\RouteConverter.cs" />
+    <Compile Include="Models\QueueMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkerRole.cs" />
   </ItemGroup>
