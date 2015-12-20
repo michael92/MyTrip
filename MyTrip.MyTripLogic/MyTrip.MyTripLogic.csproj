@@ -186,6 +186,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Media.cs" />
+    <Compile Include="Models\Point.cs" />
+    <Compile Include="Models\Route.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\MyTripUser.cs" />
     <Compile Include="Models\UnformattedRoute.cs" />
