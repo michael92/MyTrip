@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Microsoft.AspNet.Identity;
 using MyTrip.MyTripLogic.Repositories;
 
 namespace MyTrip.MyTripLogic.Controllers
@@ -23,6 +24,7 @@ namespace MyTrip.MyTripLogic.Controllers
         public IHttpActionResult Get()
         {
             var name = User.Identity.Name;
+            var userId = User.Identity.GetUserId();
             return Ok(_repo.GetTrips());
         }
 
