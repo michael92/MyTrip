@@ -28,7 +28,7 @@ namespace MediaConverter.Converters
                 if (unfroute != null)
                 {
                     Route route = this.ParseRoute(unfroute);
-                    trip.route = route;
+                    trip.Route = route;
                     tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
                 }
             }
