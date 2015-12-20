@@ -12,5 +12,7 @@ namespace MyTrip.MyTripLogic.Models
         public DateTime Date { get; set; }
 
         public bool IsPublic { get; set; }
+
+        public Route route { get; set; }
     }
 }
