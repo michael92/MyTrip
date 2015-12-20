@@ -7,12 +7,17 @@ namespace MyTrip.MyTripLogic.Models
 {
     public class Trip
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public DateTime Date { get; set; }
 
         public bool IsPublic { get; set; }
 
-        public Route route { get; set; }
+        public Route Route { get; set; }
+
+        public string UserId { get; set; }
+
+        public RouteStatus RouteStatus { get; set; }
+
     }
 }

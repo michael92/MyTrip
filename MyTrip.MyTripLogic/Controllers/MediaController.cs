@@ -24,7 +24,7 @@ namespace MyTrip.MyTripLogic.Controllers
 
         [HttpPost]
         [Route("addPhoto")]
-        public async Task<IHttpActionResult> addPhoto([FromUri] int id, [FromUri] int tripId)
+        public async Task<IHttpActionResult> addPhoto([FromUri] string id, [FromUri] string tripId)
         {
 
             string sPath = "";
@@ -48,7 +48,7 @@ namespace MyTrip.MyTripLogic.Controllers
 
         [HttpPost]
         [Route("addMovie")]
-        public async Task<IHttpActionResult> addMovie([FromUri] int id, [FromUri] int tripId)
+        public async Task<IHttpActionResult> addMovie([FromUri] string id, [FromUri] string tripId)
         {
 
             string sPath = "";

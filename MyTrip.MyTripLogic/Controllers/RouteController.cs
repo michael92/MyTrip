@@ -1,4 +1,5 @@
-﻿using MyTrip.MyTripLogic.Models;
+﻿using Microsoft.AspNet.Identity;
+using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.Repositories;
 using System;
 using System.Collections.Generic;
@@ -20,13 +21,16 @@ namespace MyTrip.MyTripLogic.Controllers
         {
             _repo = new RouteRepository();
         }
-
-
-
+        
         [HttpPost]
-        public async Task<IHttpActionResult> create([FromUri] int id, [FromUri] int tripId)
+        public async Task<IHttpActionResult> create([FromUri] string name, [FromUri] string description)
         {
-            
+            var userName = User.Identity.Name;
+            var userId = User.Identity.GetUserId();
+
+            var tripId = (new Guid()).ToString();
+            _repo.CreateTrip(userId, tripId);
+
             string sPath = "";
             sPath = System.Web.Hosting.HostingEnvironment.MapPath("~/locker/");
 
@@ -38,13 +42,12 @@ namespace MyTrip.MyTripLogic.Controllers
 
                 if (hpf.ContentLength > 0)
                 {
-
                     try
                     {
                         using (StreamReader sr = new StreamReader(hpf.InputStream))
                         {
                             string line = sr.ReadToEnd();
-                            await _repo.Create(id, line, tripId);
+                            await _repo.Create(line, tripId);
                             return Ok();
                         }
                     }

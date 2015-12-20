@@ -16,22 +16,39 @@ namespace MyTrip.MyTripLogic.Repositories
     public class RouteRepository
     {
 
-        private readonly DocumentDb db;
+        private DocumentDb unformattedRouteDb;
+        private DocumentDb tripDb;
 
         public RouteRepository()
         {
-            db = new DocumentDb("MyTripDb", "unformattedroutes");
+            unformattedRouteDb = new DocumentDb("MyTripDb", "unformattedroutes");
+            tripDb = new DocumentDb("MyTripDb", "trip");
         }
 
-        public async Task Create(int id, String line, int tripId)
+        public async Task CreateTrip(string userId, string tripId)
+        {
+            Trip trip = new Trip
+            {
+                Id = tripId,
+                Date = DateTime.Now.ToLocalTime(),
+                IsPublic = false,
+                RouteStatus = RouteStatus.Formatting,
+                UserId = userId,
+            };
+
+            DocumentClient dc = tripDb.getClient();
+            var doc = await dc.CreateDocumentAsync(tripDb.getCollection().SelfLink, trip);
+        }
+
+        public async Task Create(string line, string tripId)
         {
             UnformattedRoute ur = new UnformattedRoute();
-            ur.Id = id;
+            ur.Id = (new Guid()).ToString();
             ur.Route = line;
             ur.TripId = tripId;
-            DocumentClient dc = db.getClient();
+            DocumentClient dc = unformattedRouteDb.getClient();
             
-             var doc = await dc.CreateDocumentAsync(db.getCollection().SelfLink, ur);
+            var doc = await dc.CreateDocumentAsync(unformattedRouteDb.getCollection().SelfLink, ur);
         }
 
 

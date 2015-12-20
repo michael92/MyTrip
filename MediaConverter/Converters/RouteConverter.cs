@@ -55,8 +55,7 @@ namespace MediaConverter.Converters
 
                 route.points.Add(new Point { city = data[2],
                     latitude = latitude,
-                    longitude = longitutde,
-                    id = i
+                    longitude = longitutde
                 });
 
                 i++;

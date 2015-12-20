@@ -21,21 +21,21 @@ namespace MyTrip.MyTripLogic.Controllers
         }
 
         [Route("")]
-        public IHttpActionResult Get()
+        public IHttpActionResult Get([FromUri] int limit, [FromUri] int offset)
         {
             var name = User.Identity.Name;
             var userId = User.Identity.GetUserId();
-            return Ok(_repo.GetTrips());
+            return Ok(_repo.GetTrips(limit, offset, userId));
         }
 
         [Route("getTripInfo")]
-        public IHttpActionResult GetTrip([FromUri] int id)
+        public IHttpActionResult GetTrip([FromUri] string id)
         {
             return Ok(_repo.GetTrip(id));
         }
 
         [Route("getTrip")]
-        public IHttpActionResult GetPhotosAndMovies([FromUri] int tripId)
+        public IHttpActionResult GetPhotosAndMovies([FromUri] string tripId)
         {
             return Ok(_repo.GetPhotosAndMovies(tripId));
         }

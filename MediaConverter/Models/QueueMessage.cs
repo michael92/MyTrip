@@ -11,9 +11,9 @@ namespace MediaConverter.Models
 {
     public class QueueMessage
     {
-        public int routeId { get; set; }
+        public string routeId { get; set; }
         public QueueTaskType taskType { get; set; }
-        public int tripId { get; set; }
+        public string tripId { get; set; }
         public string url { get; set; }
 
 

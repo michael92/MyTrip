@@ -7,11 +7,11 @@ namespace MyTrip.MyTripLogic.Models
 {
     public class Media
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
-        public int TripId { get; set; }
+        public string TripId { get; set; }
 
-        public string Status { get; set; }
+        public MediaStatus Status { get; set; }
 
         public string Url { get; set; }
 

@@ -25,7 +25,7 @@ namespace MyTrip.MyTripLogic.Repositories
         }
 
 
-        public async Task CreatePhoto(int id, String url, int tripId, string thumbnailUrl, Stream inputStream)
+        public async Task CreatePhoto(string id, string url, string tripId, string thumbnailUrl, Stream inputStream)
         {
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
             Media m = new Media();
@@ -33,7 +33,7 @@ namespace MyTrip.MyTripLogic.Repositories
             m.Url = url;
             m.TripId = tripId;
             m.ThumbnailUrl = thumbnailUrl;
-            m.Status = "Formatting";
+            m.Status = MediaStatus.Formatting;
             DocumentClient dc = photodb.getClient();
 
             var doc = await dc.CreateDocumentAsync(photodb.getCollection().SelfLink, m);
@@ -44,7 +44,7 @@ namespace MyTrip.MyTripLogic.Repositories
             blockBlob.UploadFromStream(inputStream);
         }
 
-        public async Task CreateMovie(int id, String url, int tripId, string thumbnailUrl, Stream inputStream)
+        public async Task CreateMovie(string id, string url, string tripId, string thumbnailUrl, Stream inputStream)
         {
             DocumentDb moviedb = new DocumentDb("MyTripDb", "movie");
             Media m = new Media();
@@ -52,7 +52,7 @@ namespace MyTrip.MyTripLogic.Repositories
             m.Url = url;
             m.TripId = tripId;
             m.ThumbnailUrl = thumbnailUrl;
-            m.Status = "Formatting";
+            m.Status = MediaStatus.Formatting;
             DocumentClient dc = moviedb.getClient();
 
             var doc = await dc.CreateDocumentAsync(moviedb.getCollection().SelfLink, m);
