@@ -19,7 +19,7 @@ namespace MyTrip.MyTripLogic.Repositories
             DocumentClient dc = tripDb.getClient();
             var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
                 .AsEnumerable()
-                //.Where(t => t.UserId == userId)
+                .Where(t => t.UserId == userId)
                 .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
                 .OrderByDescending(t => t.Date)
                 .Skip(offset)
