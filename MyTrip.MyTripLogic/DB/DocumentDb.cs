@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using MyTrip.MyTripLogic.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
@@ -95,6 +96,24 @@ namespace MyTrip.MyTripLogic.DB
                 _database = await Client.CreateDatabaseAsync(new Microsoft.Azure.Documents.Database { Id = _databaseId });
             }
         }
-
+        public static List<Media> GetMedia(string id)
+        {
+            return Client.CreateDocumentQuery<Media>(Collection.DocumentsLink)
+                        .Where(x => x.Id == id)
+                       .AsEnumerable()
+                       .ToList<Media>();
+        }
+        public static async Task<Document> UpdateItemAsync(Media item)
+        {
+            Document doc = GetDocument(item.Id);
+            return await Client.ReplaceDocumentAsync(doc.SelfLink, item);
+        }
+        public static Document GetDocument(string id)
+        {
+            return Client.CreateDocumentQuery(Collection.DocumentsLink)
+                          .Where(d => d.Id == id)
+                          .AsEnumerable()
+                          .FirstOrDefault();
+        }
     }
 }
