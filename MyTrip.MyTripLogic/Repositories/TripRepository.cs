@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.DB;
-using Microsoft.Azure.Documents.Client;
 
 namespace MyTrip.MyTripLogic.Repositories
 {
@@ -14,13 +17,14 @@ namespace MyTrip.MyTripLogic.Repositories
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
             DocumentClient dc = tripDb.getClient();
-            var result = dc.CreateDocumentQuery<Trip>(new Uri(tripDb.getCollection().SelfLink))
-                //.Where()
-                .OrderBy(t => t.Date)
+            var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+                .AsEnumerable()
+                //.Where(t => t.UserId == userId)
+                .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
+                .OrderByDescending(t => t.Date)
                 .Skip(offset)
                 .Take(limit)
                 .ToList();
-
             return result;
         }
 
@@ -28,11 +32,17 @@ namespace MyTrip.MyTripLogic.Repositories
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
             DocumentClient dc = tripDb.getClient();
-            return dc.CreateDocumentQuery<Trip>(new Uri(tripDb.getCollection().SelfLink)).Where(t => t.Id == id).FirstOrDefault();
+            var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == id)
+                .FirstOrDefault();
+            return result;
         }
 
         public IEnumerable<Media> GetPhotosAndMovies(string tripId)
         {
+            // TODO: Poprawić na implementację jak wyżej
+            // Ta nie działa !!!
             DocumentDb tripDb = new DocumentDb("MyTripDb", "photo");
             DocumentClient dc = tripDb.getClient();
             var photos = dc.CreateDocumentQuery<Media>(new Uri(tripDb.getCollection().SelfLink)).Where(t => t.TripId == tripId);

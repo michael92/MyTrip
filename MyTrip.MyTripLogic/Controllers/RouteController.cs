@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Script.Serialization;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
@@ -28,11 +29,11 @@ namespace MyTrip.MyTripLogic.Controllers
             var userName = User.Identity.Name;
             var userId = User.Identity.GetUserId();
 
-            var tripId = (new Guid()).ToString();
-            _repo.CreateTrip(userId, tripId);
+            var tripId = Guid.NewGuid().ToString();
+            _repo.CreateTrip(userId, tripId, name, description);
 
             string sPath = "";
-            sPath = System.Web.Hosting.HostingEnvironment.MapPath("~/locker/");
+            sPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Uploads");
 
             System.Web.HttpFileCollection hfc = System.Web.HttpContext.Current.Request.Files;
 
@@ -48,7 +49,7 @@ namespace MyTrip.MyTripLogic.Controllers
                         {
                             string line = sr.ReadToEnd();
                             await _repo.Create(line, tripId);
-                            return Ok();
+                            return Ok(tripId);
                         }
                     }
                     catch (Exception e)

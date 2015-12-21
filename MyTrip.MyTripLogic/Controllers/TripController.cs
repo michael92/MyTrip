@@ -34,7 +34,7 @@ namespace MyTrip.MyTripLogic.Controllers
             return Ok(_repo.GetTrip(id));
         }
 
-        [Route("getTrip")]
+        [Route("getMediaList")]
         public IHttpActionResult GetPhotosAndMovies([FromUri] string tripId)
         {
             return Ok(_repo.GetPhotosAndMovies(tripId));

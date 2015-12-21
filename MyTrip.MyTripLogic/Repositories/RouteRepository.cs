@@ -25,7 +25,7 @@ namespace MyTrip.MyTripLogic.Repositories
             tripDb = new DocumentDb("MyTripDb", "trip");
         }
 
-        public async Task CreateTrip(string userId, string tripId)
+        public async Task CreateTrip(string userId, string tripId, string name, string description)
         {
             Trip trip = new Trip
             {
@@ -34,6 +34,8 @@ namespace MyTrip.MyTripLogic.Repositories
                 IsPublic = false,
                 RouteStatus = RouteStatus.Formatting,
                 UserId = userId,
+                Name = name,
+                Description = description
             };
 
             DocumentClient dc = tripDb.getClient();
@@ -43,7 +45,7 @@ namespace MyTrip.MyTripLogic.Repositories
         public async Task Create(string line, string tripId)
         {
             UnformattedRoute ur = new UnformattedRoute();
-            ur.Id = (new Guid()).ToString();
+            ur.Id = Guid.NewGuid().ToString();
             ur.Route = line;
             ur.TripId = tripId;
             DocumentClient dc = unformattedRouteDb.getClient();
