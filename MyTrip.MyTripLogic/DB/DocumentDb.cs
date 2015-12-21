@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using MyTrip.MyTripLogic.Models;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Newtonsoft.Json;
+using MyTrip.MyTripLogic.Models;
 
 namespace MyTrip.MyTripLogic.DB
 {
