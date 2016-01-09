@@ -1,7 +1,13 @@
-﻿using MyTrip.MyTripLogic.Models;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using MyTrip.MyTripLogic.DB;
+using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -72,6 +78,47 @@ namespace MyTrip.MyTripLogic.Controllers
             }
 
             return InternalServerError();
+        }
+
+        [HttpDelete]
+        [Route("deletePhoto")]
+        public async Task<IHttpActionResult> deletePhoto([FromUri] string photoId)
+        {
+
+            DocumentDb tripDB = new DocumentDb("MyTripDb", "photo");
+            DocumentClient tripDBClient = tripDB.getClient();
+
+            var photo = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == photoId).FirstOrDefault();
+            if (photo != null)
+            {
+                await tripDBClient.DeleteDocumentAsync(photo.SelfLink);
+            }
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference("photo");
+            CloudBlockBlob blob = container.GetBlockBlobReference(photo.GetPropertyValue<String>("Url"));
+            blob.DeleteIfExists();
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("deleteMovie")]
+        public async Task<IHttpActionResult> deleteMovie([FromUri] string movieId)
+        {
+            DocumentDb tripDB = new DocumentDb("MyTripDb", "movie");
+            DocumentClient tripDBClient = tripDB.getClient();
+
+            var movie = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == movieId).FirstOrDefault();
+            if(movie!= null)
+            {
+                await tripDBClient.DeleteDocumentAsync(movie.SelfLink);
+            }
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference("movie");
+            CloudBlockBlob blob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("Url"));
+            blob.DeleteIfExists();
+            return Ok();
         }
 
 
