@@ -2,6 +2,7 @@
 using Microsoft.Azure.Documents.Client;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.Queue;
 using MyTrip.MyTripLogic.DB;
 using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.Repositories;
@@ -45,6 +46,16 @@ namespace MyTrip.MyTripLogic.Controllers
                 if (hpf.ContentLength > 0)
                 {
                     await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id, hpf.InputStream);
+                    QueueMessage qm = new QueueMessage();
+                    qm.tripId = tripId;
+                    qm.taskType = QueueTaskType.ConvertPhoto;
+                    qm.url = "https://mytripblob.blob.core.windows.net/photo/" + id;
+                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
+                    CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+                    CloudQueue queue = queueClient.GetQueueReference("converter");
+                    queue.CreateIfNotExists();
+                    CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
+                    queue.AddMessage(message);
                     return Ok();
                 }
             }
@@ -72,6 +83,16 @@ namespace MyTrip.MyTripLogic.Controllers
                     if (hpf.ContentLength > 0)
                     {
                         await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id, hpf.InputStream);
+                        QueueMessage qm = new QueueMessage();
+                        qm.tripId = tripId;
+                        qm.taskType = QueueTaskType.ConvertMovie;
+                        qm.url = "https://mytripblob.blob.core.windows.net/movie/" + id;
+                        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
+                        CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+                        CloudQueue queue = queueClient.GetQueueReference("converter");
+                        queue.CreateIfNotExists();
+                        CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
+                        queue.AddMessage(message);
                         return Ok();
                     }
                 }

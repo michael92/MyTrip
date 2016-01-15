@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNet.Identity;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -49,6 +52,15 @@ namespace MyTrip.MyTripLogic.Controllers
                         {
                             string line = sr.ReadToEnd();
                             await _repo.Create(line, tripId);
+                            QueueMessage qm = new QueueMessage();
+                            qm.tripId = tripId;
+                            qm.taskType = QueueTaskType.ConvertRoute;
+                            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
+                            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+                            CloudQueue queue = queueClient.GetQueueReference("converter");
+                            queue.CreateIfNotExists();
+                            CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
+                            queue.AddMessage(message);
                             return Ok(tripId);
                         }
                     }
