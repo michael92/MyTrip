@@ -12,7 +12,6 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using MediaConverter.Converters;
 using MyTrip.MyTripLogic.Models;
-using MediaConverter.Models;
 
 namespace MediaConverter
 {    
