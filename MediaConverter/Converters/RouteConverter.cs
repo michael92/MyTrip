@@ -1,5 +1,4 @@
-﻿using MediaConverter.Models;
-using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents.Client;
 using MyTrip.MyTripLogic.DB;
 using MyTrip.MyTripLogic.Models;
 using System;

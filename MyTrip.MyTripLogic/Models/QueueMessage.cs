@@ -23,6 +23,11 @@ namespace MyTrip.MyTripLogic.Models
             return m;
         }
 
+        public static QueueMessage DeserializeMessage(CloudQueueMessage msg)
+        {
+            return new JavaScriptSerializer().Deserialize<QueueMessage>(msg.AsString);
+        }
+
     }
 
     public enum QueueTaskType
@@ -34,5 +39,4 @@ namespace MyTrip.MyTripLogic.Models
         GenerateMovie
     }
 
-}
 }
