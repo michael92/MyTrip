@@ -16,7 +16,7 @@ namespace MyTrip.MyTripLogic.Models
             results = new List<Result>();
         }
 
-        public static Rootobject DeserializeMessage(string msg)
+        public static Rootobject Deserialize(string msg)
         {
             return new JavaScriptSerializer().Deserialize<Rootobject>(msg);
         }

@@ -4,6 +4,7 @@ using MyTrip.MyTripLogic.Models;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 
 namespace MediaConverter.Converters
 {
@@ -41,7 +42,6 @@ namespace MediaConverter.Converters
         {
             var points = unfroute.Route.Split(';');
             Route route = new Route {id = unfroute.Id };
-            int i = 0;
 
             foreach (var point in points)
             {
@@ -52,15 +52,43 @@ namespace MediaConverter.Converters
                 double latitude = Convert.ToDouble(data[0]);
                 double longitutde = Convert.ToDouble(data[1]);
 
-                route.points.Add(new Point { city = data[2],
+                route.points.Add(new Point {
+                    city = this.GetPlaceName(latitude,longitutde),
                     latitude = latitude,
                     longitude = longitutde
                 });
-
-                i++;
+                
             }
 
             return route ;
+        }
+
+        private string GetPlaceName(double latitude, double longitutde)
+        {
+            string url = string.Format("https://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&key=AIzaSyC0sQ1pLDtQM7atcDpfJfmjD2TWLYf-jn0", latitude,longitutde);
+            string result = String.Empty;
+
+            using (WebClient wc = new WebClient())
+            {
+                result = wc.DownloadString(url);
+            }
+            
+
+            try
+            {
+                var googleResult = Rootobject.Deserialize(result);
+
+                if (googleResult != null && googleResult.results.Count > 0)
+                {
+                    result = googleResult.results[0].formatted_address;
+                }
+            }
+            catch(Exception)
+            {
+                Trace.TraceInformation("GoogleMaps Revert Geocoding exception");
+            }
+
+            return result;
         }
     }
 }
