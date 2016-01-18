@@ -33,7 +33,7 @@ namespace MediaConverter.Converters
 
                     if (gpx != null)
                     {
-                        Trace.TraceInformation("GPX route format {)}", msg.routeId);
+                        Trace.TraceInformation("GPX route format {0})}", msg.routeId);
                         route = this.ParseGpxRoute(gpx,unfroute);
                     }
                     else
@@ -105,7 +105,6 @@ namespace MediaConverter.Converters
                     latitude = latitude,
                     longitude = longitutde
                 });
-
             }
 
             return route;
