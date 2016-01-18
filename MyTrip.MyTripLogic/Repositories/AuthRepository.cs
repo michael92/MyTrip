@@ -46,6 +46,12 @@ namespace MyTrip.MyTripLogic.Repositories
             return user;
         }
 
+        public async Task<IdentityUser> FindByEmail(string email)
+        {
+            var user = await userStore.FindByEmailAsync(email);
+            return user;
+        }
+
         public async Task<IdentityResult> ValidateUserAsync(string userName, string password)
         {
             var user = await FindUser(userName);
