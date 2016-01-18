@@ -74,27 +74,5 @@ namespace MyTrip.MyTripLogic.Repositories
             await client.ReplaceDocumentAsync(doc.SelfLink, trip);
         }
 
-        public IEnumerable<Media> GetPhotosAndMovies(string tripId)
-        {
-            // TODO: Poprawić na implementację jak wyżej
-            // Ta nie działa !!!
-            DocumentDb tripDb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient dc = tripDb.getClient();
-            var photos = dc.CreateDocumentQuery<Media>(tripDb.getCollection().DocumentsLink)
-                .AsEnumerable()
-                .Where(t => t.Id == tripId)
-                .ToList();
-
-            tripDb = new DocumentDb("MyTripDb", "movie");
-            dc = tripDb.getClient();
-
-            var movies = dc.CreateDocumentQuery<Media>(tripDb.getCollection().DocumentsLink)
-                .AsEnumerable()
-                .Where(t => t.Id == tripId)
-                .ToList();
-
-            return photos.Concat(movies);
-        }
-
     }
 }

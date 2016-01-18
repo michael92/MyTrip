@@ -45,12 +45,6 @@ namespace MyTrip.MyTripLogic.Controllers
             return Ok();
         }
 
-        [Route("getMediaList")]
-        public IHttpActionResult GetPhotosAndMovies([FromUri] string tripId)
-        {
-            return Ok(_repo.GetPhotosAndMovies(tripId));
-        }
-
         [Route("generatePoster")]
         public IHttpActionResult GeneratePoster([FromUri] string tripId)
         {

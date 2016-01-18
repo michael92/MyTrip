@@ -20,6 +20,7 @@ using System.Web.Http;
 namespace MyTrip.MyTripLogic.Controllers
 {
     [RoutePrefix("api/Media")]
+    [Authorize]
     public class MediaController : ApiController
     {
         private readonly MediaRepository _repo;
@@ -142,7 +143,19 @@ namespace MyTrip.MyTripLogic.Controllers
             return Ok();
         }
 
+        [HttpGet]
+        [Route("getPhotos")]
+        public IHttpActionResult GetPhotos([FromUri] string tripId)
+        {
+            return Ok(_repo.GetPhotos(tripId));
+        }
 
+        [HttpGet]
+        [Route("getMovies")]
+        public IHttpActionResult GetMovies([FromUri] string tripId)
+        {
+            return Ok(_repo.GetMovies(tripId));
+        }
 
     }
 }
