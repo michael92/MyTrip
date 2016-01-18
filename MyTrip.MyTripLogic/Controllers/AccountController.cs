@@ -47,10 +47,24 @@ namespace MyTrip.MyTripLogic.Controllers
             var user = await _repo.FindByEmail(email);
             if (user == null)
                 return NotFound();
-            
+
             var token = await _repo.GetPasswordResetToken(user.Id);
             var emailService = new MandrillEmailService();
             await emailService.SendPasswordResetEmail(user, token);
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [Route("PasswordReset")]
+        public async Task<IHttpActionResult> PostPasswordReset(PasswordResetModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _repo.ResetPassword(model.UserId, model.Password, model.Token);
+            if (!result)
+                return BadRequest("Incorrect userid or token");
 
             return Ok();
         }
