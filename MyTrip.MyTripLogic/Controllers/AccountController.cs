@@ -3,6 +3,7 @@ using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.Repositories;
+using MyTrip.MyTripLogic.Services;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
@@ -35,6 +36,39 @@ namespace MyTrip.MyTripLogic.Controllers
             {
                 return errorResult;
             }
+
+            await new MandrillEmailService().SendWelcomeEmail(user.Email, user.UserName);
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [Route("PasswordResetEmail")]
+        public async Task<IHttpActionResult> GetPasswordResetEmail(string email)
+        {
+            var user = await _repo.FindByEmail(email);
+            if (user == null)
+                return NotFound();
+
+            var token = await _repo.GetPasswordResetToken(user.Id);
+            var emailService = new MandrillEmailService();
+
+            var result = await emailService.SendPasswordResetEmail(user, token);
+            if (!result)
+                return InternalServerError();
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [Route("PasswordReset")]
+        public async Task<IHttpActionResult> PostPasswordReset(PasswordResetModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _repo.ResetPassword(model.UserId, model.Password, model.Token);
+            if (!result)
+                return BadRequest("Incorrect userid or token");
 
             return Ok();
         }

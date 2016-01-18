@@ -27,13 +27,13 @@ namespace MyTrip.MyTripLogic.Controllers
         }
         
         [HttpPost]
-        public async Task<IHttpActionResult> create([FromUri] string name, [FromUri] string description)
+        public async Task<IHttpActionResult> create([FromUri] string name, [FromUri] string description, [FromUri] bool isPublic)
         {
             var userName = User.Identity.Name;
             var userId = User.Identity.GetUserId();
 
             var tripId = Guid.NewGuid().ToString();
-            _repo.CreateTrip(userId, tripId, name, description);
+            _repo.CreateTrip(userId, tripId, name, description, isPublic);
 
             string sPath = "";
             sPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Uploads");

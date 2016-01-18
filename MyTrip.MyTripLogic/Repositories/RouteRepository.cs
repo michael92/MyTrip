@@ -25,21 +25,22 @@ namespace MyTrip.MyTripLogic.Repositories
             tripDb = new DocumentDb("MyTripDb", "trip");
         }
 
-        public async Task CreateTrip(string userId, string tripId, string name, string description)
+        public void CreateTrip(string userId, string tripId, string name, string description, bool isPublic)
         {
             Trip trip = new Trip
             {
                 Id = tripId,
                 Date = DateTime.Now.ToLocalTime(),
-                IsPublic = false,
+                IsPublic = isPublic,
                 RouteStatus = RouteStatus.Formatting,
                 UserId = userId,
                 Name = name,
                 Description = description
             };
 
+            tripDb = new DocumentDb("MyTripDb", "trip");
             DocumentClient dc = tripDb.getClient();
-            var doc = await dc.CreateDocumentAsync(tripDb.getCollection().SelfLink, trip);
+            dc.CreateDocumentAsync(tripDb.getCollection().SelfLink, trip).Wait();
         }
 
         public async Task Create(string line, string tripId)
@@ -48,6 +49,8 @@ namespace MyTrip.MyTripLogic.Repositories
             ur.Id = Guid.NewGuid().ToString();
             ur.Route = line;
             ur.TripId = tripId;
+
+            unformattedRouteDb = new DocumentDb("MyTripDb", "unformattedroutes");
             DocumentClient dc = unformattedRouteDb.getClient();
             
             var doc = await dc.CreateDocumentAsync(unformattedRouteDb.getCollection().SelfLink, ur);
