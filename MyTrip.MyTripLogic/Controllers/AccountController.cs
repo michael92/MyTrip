@@ -50,7 +50,10 @@ namespace MyTrip.MyTripLogic.Controllers
 
             var token = await _repo.GetPasswordResetToken(user.Id);
             var emailService = new MandrillEmailService();
-            await emailService.SendPasswordResetEmail(user, token);
+
+            var result = await emailService.SendPasswordResetEmail(user, token);
+            if (!result)
+                return InternalServerError();
 
             return Ok();
         }

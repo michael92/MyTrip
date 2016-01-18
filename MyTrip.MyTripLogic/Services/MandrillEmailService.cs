@@ -21,7 +21,7 @@ namespace MyTrip.MyTripLogic.Services
             _api = new MandrillApi(apiKey);
         }
 
-        public async Task SendPasswordResetEmail(IdentityUser user, string token)
+        public async Task<bool> SendPasswordResetEmail(IdentityUser user, string token)
         {
             var email = new EmailAddress(user.Email);
 
@@ -39,7 +39,11 @@ namespace MyTrip.MyTripLogic.Services
 
             var request = new SendMessageTemplateRequest(message, "passreset", Enumerable.Empty<TemplateContent>());
             var result = await _api.SendMessageTemplate(request);
-            var c = result.Count;
+            if (!result.Any())
+                return false;
+
+            return result.FirstOrDefault().Status == EmailResultStatus.Sent;
+
         }
 
         private string GetUrl(string userId, string token)
