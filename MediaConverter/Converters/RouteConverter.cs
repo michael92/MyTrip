@@ -41,12 +41,15 @@ namespace MediaConverter.Converters
                         route = this.ParseRoute(unfroute);
                     }
                     trip.Route = route;
+                    trip.RouteStatus = RouteStatus.Success;
                     tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
                 }
             }
             catch(Exception e)
             {
                 Trace.TraceInformation("Failed to proccess unformattedroute {0} {1}", msg.routeId,e.ToString());
+                trip.RouteStatus = RouteStatus.InvalidFormat;
+                tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
             }
         }
 
