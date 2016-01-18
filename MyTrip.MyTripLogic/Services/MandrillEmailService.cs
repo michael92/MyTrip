@@ -1,4 +1,5 @@
-﻿using Mandrill;
+﻿using JF.AspNet.Identity.DocumentDB;
+using Mandrill;
 using Mandrill.Models;
 using Mandrill.Requests.Messages;
 using Microsoft.Azure;
@@ -17,7 +18,7 @@ namespace MyTrip.MyTripLogic.Services
             _api = new MandrillApi(apiKey);
         }
 
-        public async Task SendPasswordResetEmail(MyTripUser user, string token)
+        public async Task SendPasswordResetEmail(IdentityUser user, string token)
         {
             var email = new EmailAddress(user.Email);
 
