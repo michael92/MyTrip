@@ -13,10 +13,11 @@ namespace MyTrip.MyTripLogic.Services
     public class MandrillEmailService
     {
         private readonly MandrillApi _api;
-        private string passwordResetUrl = "test.pl";
+        private string passwordResetUrl;
 
         public MandrillEmailService()
         {
+            passwordResetUrl = CloudConfigurationManager.GetSetting("PassResetFormUri");
             var apiKey = CloudConfigurationManager.GetSetting("MandrillApiKey");
             _api = new MandrillApi(apiKey);
         }
