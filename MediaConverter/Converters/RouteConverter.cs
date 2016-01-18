@@ -10,6 +10,7 @@ namespace MediaConverter.Converters
 {
     public class RouteConverter : IConverter
     {
+        public static string APIKey = "AIzaSyC0sQ1pLDtQM7atcDpfJfmjD2TWLYf-jn0";
         public void ConvertData(QueueMessage msg)
         {
             DocumentDb unfrouteDB = new DocumentDb("MyTripDb", "unformattedroute");
@@ -27,7 +28,18 @@ namespace MediaConverter.Converters
 
                 if (unfroute != null)
                 {
-                    Route route = this.ParseRoute(unfroute);
+                    Gpx gpx = this.GetGpxRoute(unfroute);
+                    Route route = null;
+
+                    if (gpx != null)
+                    {
+                        Trace.TraceInformation("GPX route format {)}", msg.routeId);
+                        route = this.ParseGpxRoute(gpx,unfroute);
+                    }
+                    else
+                    {
+                        route = this.ParseRoute(unfroute);
+                    }
                     trip.Route = route;
                     tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
                 }
@@ -35,6 +47,19 @@ namespace MediaConverter.Converters
             catch(Exception e)
             {
                 Trace.TraceInformation("Failed to proccess unformattedroute {0} {1}", msg.routeId,e.ToString());
+            }
+        }
+
+        private Gpx GetGpxRoute(UnformattedRoute route)
+        {
+            try
+            {
+                return Gpx.DeserializeGPX(route.Route);
+            }
+            catch(Exception e)
+            {
+                Trace.TraceInformation("Failed to parse GPX file {0} for unformattedRoute: {1}", e.ToString(), route.Id);
+                return null;
             }
         }
 
@@ -63,16 +88,38 @@ namespace MediaConverter.Converters
             return route ;
         }
 
+        private Route ParseGpxRoute(Gpx gpxRoute, UnformattedRoute unfroute)
+        {
+            Route route = new Route { id = unfroute.Id };
+
+            foreach (var point in gpxRoute.trk.trkseg)
+            {
+                Trace.TraceInformation("Converting GPX point {0} ", point);
+
+                double latitude = Convert.ToDouble(point.lat);
+                double longitutde = Convert.ToDouble(point.lon);
+
+                route.points.Add(new Point
+                {
+                    city = this.GetPlaceName(latitude, longitutde),
+                    latitude = latitude,
+                    longitude = longitutde
+                });
+
+            }
+
+            return route;
+        }
+
         private string GetPlaceName(double latitude, double longitutde)
         {
-            string url = string.Format("https://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&key=AIzaSyC0sQ1pLDtQM7atcDpfJfmjD2TWLYf-jn0", latitude,longitutde);
+            string url = string.Format("https://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&key={2}", latitude,longitutde,APIKey);
             string result = String.Empty;
 
             using (WebClient wc = new WebClient())
             {
                 result = wc.DownloadString(url);
-            }
-            
+            }            
 
             try
             {

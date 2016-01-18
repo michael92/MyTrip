@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
+using System.Xml.Serialization;
 
 namespace MyTrip.MyTripLogic.Models
 {
 
     /// <remarks/>
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.topografix.com/GPX/1/1")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.topografix.com/GPX/1/1", IsNullable = false, ElementName ="gpx")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.topografix.com/GPX/1/1", IsNullable = false, ElementName = "gpx")]
     public partial class Gpx
     {
 
@@ -88,6 +90,12 @@ namespace MyTrip.MyTripLogic.Models
             {
                 this.creatorField = value;
             }
+        }
+
+        public static Gpx DeserializeGPX(string gpx)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(Gpx));
+            return (Gpx)serializer.Deserialize(new StringReader(gpx));
         }
     }
 
