@@ -25,17 +25,24 @@ namespace MyTrip.MyTripLogic.Controllers
         }
 
         [Route("")]
-        public IHttpActionResult Get([FromUri] int limit, [FromUri] int offset)
+        public IHttpActionResult Get([FromUri] int limit, [FromUri] int offset, [FromUri] bool isPublic)
         {
             var name = User.Identity.Name;
             var userId = User.Identity.GetUserId();
-            return Ok(_repo.GetTrips(limit, offset, userId));
+            return Ok(_repo.GetTrips(limit, offset, userId, isPublic));
         }
 
         [Route("getTripInfo")]
         public IHttpActionResult GetTrip([FromUri] string id)
         {
             return Ok(_repo.GetTrip(id));
+        }
+
+        [Route("editTrip")]
+        public IHttpActionResult EditTrip([FromUri] string id, [FromUri] string name = null, [FromUri] string description = null, [FromUri] bool? isPublic = null)
+        {
+            //TODO
+            return Ok();
         }
 
         [Route("getMediaList")]

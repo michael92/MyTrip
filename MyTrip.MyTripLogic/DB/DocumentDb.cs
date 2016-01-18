@@ -115,5 +115,13 @@ namespace MyTrip.MyTripLogic.DB
                           .AsEnumerable()
                           .FirstOrDefault();
         }
+
+        public Document GetDocumentById(string id)
+        {
+            return _client.CreateDocumentQuery(Collection.DocumentsLink)
+                          .Where(d => d.Id == id)
+                          .AsEnumerable()
+                          .FirstOrDefault();
+        }
     }
 }
