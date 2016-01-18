@@ -32,7 +32,8 @@ namespace MyTrip.MyTripLogic.Repositories
             var user = new MyTripUser()
             {
                 UserName = registrationModel.UserName,
-                PasswordHash = manager.PasswordHasher.HashPassword(registrationModel.Password)
+                PasswordHash = manager.PasswordHasher.HashPassword(registrationModel.Password),
+                Email = registrationModel.Email
             };
             await userStore.CreateAsync(user);
             return IdentityResult.Success;
