@@ -188,6 +188,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\GoogleResults.cs" />
+    <Compile Include="Models\GPXModel.cs" />
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="Models\QueueMessage.cs" />
