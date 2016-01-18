@@ -52,6 +52,12 @@ namespace MyTrip.MyTripLogic.Repositories
             return user;
         }
 
+        public async Task<string> GetPasswordResetToken(string userId)
+        {
+            UserManager<MyTripUser> manager = new UserManager<MyTripUser>(userStore);
+            return await manager.GeneratePasswordResetTokenAsync(userId);
+        }
+
         public async Task<IdentityResult> ValidateUserAsync(string userName, string password)
         {
             var user = await FindUser(userName);
