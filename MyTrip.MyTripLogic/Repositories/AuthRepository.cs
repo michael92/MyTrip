@@ -65,9 +65,16 @@ namespace MyTrip.MyTripLogic.Repositories
                 return IdentityResult.Failed();
             UserManager<MyTripUser> manager = new UserManager<MyTripUser>(userStore);
             var verificationResult = manager.PasswordHasher.VerifyHashedPassword(user.PasswordHash, password);
-            if(verificationResult == PasswordVerificationResult.Failed)
+            if (verificationResult == PasswordVerificationResult.Failed)
                 return IdentityResult.Failed();
             return IdentityResult.Success;
+        }
+
+        public async Task<bool> ResetPassword(string userId, string password, string token)
+        {
+            UserManager<MyTripUser> manager = new UserManager<MyTripUser>(userStore);
+            var result = await manager.ResetPasswordAsync(userId, token, password);
+            return result.Succeeded;
         }
     }
 }
