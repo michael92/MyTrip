@@ -53,6 +53,10 @@
       <HintPath>..\packages\JF.Azure.DocumentDB.1.0.7\lib\JF.Azure.DocumentDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Mandrill, Version=2.2.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Mandrill.2.2.12.0\lib\net45\Mandrill.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
       <Private>True</Private>
