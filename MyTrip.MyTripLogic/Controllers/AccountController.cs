@@ -3,6 +3,7 @@ using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.Repositories;
+using MyTrip.MyTripLogic.Services;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
@@ -35,6 +36,21 @@ namespace MyTrip.MyTripLogic.Controllers
             {
                 return errorResult;
             }
+
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [Route("PasswordResetEmail")]
+        public async Task<IHttpActionResult> GetPasswordResetEmail(string email)
+        {
+            var user = await _repo.FindByEmail(email);
+            if (user == null)
+                return NotFound();
+            
+            var token = await _repo.GetPasswordResetToken(user.Id);
+            var emailService = new MandrillEmailService();
+            await emailService.SendPasswordResetEmail(user, token);
 
             return Ok();
         }
