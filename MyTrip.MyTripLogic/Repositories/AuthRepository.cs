@@ -9,18 +9,25 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using MyTrip.MyTripLogic.DB;
 using MyTrip.MyTripLogic.Models;
+using Microsoft.Owin.Security.DataProtection;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace MyTrip.MyTripLogic.Repositories
 {
     public class AuthRepository
     {
         private readonly DocumentDBUserStore<MyTripUser> userStore;
+        private readonly UserManager<MyTripUser> manager;
 
         public AuthRepository() 
         {
             var identityCollectionManager= new IdentityCollectionManager<MyTripUser>(DocumentDb.Client, DocumentDb.Database, true);
             var identityRoleStore = new IdentityRoleStore();
-            this.userStore= new DocumentDBUserStore<MyTripUser>(identityCollectionManager, identityRoleStore); 
+            this.userStore= new DocumentDBUserStore<MyTripUser>(identityCollectionManager, identityRoleStore);
+
+            manager = new UserManager<MyTripUser>(userStore);
+            var provider = new DpapiDataProtectionProvider("MyTrip");
+            manager.UserTokenProvider = new DataProtectorTokenProvider<MyTripUser, string>(provider.Create("EmailConfirmation"));
         }
 
         public async Task<IdentityResult> RegisterUserAsync(UserRegistrationModel registrationModel)
@@ -28,14 +35,14 @@ namespace MyTrip.MyTripLogic.Repositories
             var existingUser = await FindUser(registrationModel.UserName);
             if (existingUser != null)
                 return IdentityResult.Failed("User with this username already exists");
-            UserManager<MyTripUser> manager=new UserManager<MyTripUser>(userStore);
+
             var user = new MyTripUser()
             {
                 UserName = registrationModel.UserName,
-                PasswordHash = manager.PasswordHasher.HashPassword(registrationModel.Password),
-                Email = registrationModel.Email
+                Email = registrationModel.Email,
+                SecurityStamp = Guid.NewGuid().ToString()
             };
-            await userStore.CreateAsync(user);
+            await manager.CreateAsync(user, registrationModel.Password);
             return IdentityResult.Success;
         }
 
@@ -54,7 +61,6 @@ namespace MyTrip.MyTripLogic.Repositories
 
         public async Task<string> GetPasswordResetToken(string userId)
         {
-            UserManager<MyTripUser> manager = new UserManager<MyTripUser>(userStore);
             return await manager.GeneratePasswordResetTokenAsync(userId);
         }
 
@@ -72,7 +78,6 @@ namespace MyTrip.MyTripLogic.Repositories
 
         public async Task<bool> ResetPassword(string userId, string password, string token)
         {
-            UserManager<MyTripUser> manager = new UserManager<MyTripUser>(userStore);
             var result = await manager.ResetPasswordAsync(userId, token, password);
             return result.Succeeded;
         }
