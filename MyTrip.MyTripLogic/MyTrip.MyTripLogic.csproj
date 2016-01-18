@@ -197,6 +197,7 @@
     </Compile>
     <Compile Include="Models\GoogleResults.cs" />
     <Compile Include="Models\Media.cs" />
+    <Compile Include="Models\PasswordResetModel.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="Models\QueueMessage.cs" />
     <Compile Include="Models\Route.cs" />
