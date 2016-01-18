@@ -47,6 +47,28 @@ namespace MyTrip.MyTripLogic.Services
 
         }
 
+        public async Task<bool> SendWelcomeEmail(string email, string username)
+        {
+            var email = new EmailAddress(user.Email);
+
+            var message = new EmailMessage
+            {
+                FromEmail = "noreplay@mytrip.com",
+                Tags = new[] { "welcome" },
+                To = new[] { email }
+            };
+
+            message.AddGlobalVariable("username", username);
+
+            var request = new SendMessageTemplateRequest(message, "welcome", Enumerable.Empty<TemplateContent>());
+            var result = await _api.SendMessageTemplate(request);
+            if (!result.Any())
+                return false;
+
+            return result.FirstOrDefault().Status == EmailResultStatus.Sent;
+
+        }
+
         private string GetUrl(string userId, string token)
         {
             var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);

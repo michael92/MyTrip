@@ -37,6 +37,7 @@ namespace MyTrip.MyTripLogic.Controllers
                 return errorResult;
             }
 
+            await new MandrillEmailService().SendWelcomeEmail(user.Email, user.UserName);
             return Ok();
         }
 
