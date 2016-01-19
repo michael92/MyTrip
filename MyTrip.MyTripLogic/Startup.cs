@@ -4,12 +4,14 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using MyTrip.MyTripLogic.Authentication;
 using Owin;
-
+using Microsoft.Owin.Security.DataProtection;
 
 namespace MyTrip.MyTripLogic
 {
     public class Startup
     {
+        internal static IDataProtectionProvider DataProtectionProvider { get; private set; }
+
         public void Configuration(IAppBuilder app)
         {
             ConfigureOAuth(app);
@@ -19,6 +21,7 @@ namespace MyTrip.MyTripLogic
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(config);
             //Rest of code is here;
+            DataProtectionProvider = app.GetDataProtectionProvider();
         }
 
         public void ConfigureOAuth(IAppBuilder app)
