@@ -39,8 +39,8 @@ namespace MyTrip.MyTripLogic.Repositories
             };
 
             tripDb = new DocumentDb("MyTripDb", "trip");
-            DocumentClient dc = tripDb.getClient();
-            dc.CreateDocumentAsync(tripDb.getCollection().SelfLink, trip).Wait();
+            DocumentClient dc = tripDb.Client;
+            dc.CreateDocumentAsync(tripDb.Collection.SelfLink, trip).Wait();
         }
 
         public async Task Create(string line, string tripId)
@@ -51,9 +51,9 @@ namespace MyTrip.MyTripLogic.Repositories
             ur.TripId = tripId;
 
             unformattedRouteDb = new DocumentDb("MyTripDb", "unformattedroutes");
-            DocumentClient dc = unformattedRouteDb.getClient();
+            DocumentClient dc = unformattedRouteDb.Client;
             
-            var doc = await dc.CreateDocumentAsync(unformattedRouteDb.getCollection().SelfLink, ur);
+            var doc = await dc.CreateDocumentAsync(unformattedRouteDb.Collection.SelfLink, ur);
         }
 
 

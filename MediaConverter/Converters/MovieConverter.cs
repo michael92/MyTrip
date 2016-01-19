@@ -17,9 +17,9 @@ namespace MediaConverter.Converters
         public void ConvertData(QueueMessage msg)
         {
             DocumentDb moviedb = new DocumentDb("MyTripDb", "movie");
-            DocumentClient movieDBClient = moviedb.getClient();
+            DocumentClient movieDBClient = moviedb.Client;
 
-            var movie = movieDBClient.CreateDocumentQuery<Media>(new Uri(moviedb.getCollection().SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
+            var movie = movieDBClient.CreateDocumentQuery<Media>(new Uri(moviedb.Collection.SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
             // movie.ThumbnailUrl = "thumbnail-" + movie.Id + ".png";
             movie.ThumbnailUrl = null;
             movie.Url = "https://mytripblob.blob.core.windows.net/movie/" + movie.Id + ".avi";
@@ -49,7 +49,7 @@ namespace MediaConverter.Converters
 
 
 
-            movieDBClient.ReplaceDocumentAsync(new Uri(moviedb.getCollection().SelfLink), movie);
+            movieDBClient.ReplaceDocumentAsync(new Uri(moviedb.Collection.SelfLink), movie);
         }
     }
 }

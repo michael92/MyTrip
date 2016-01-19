@@ -14,16 +14,16 @@ namespace MediaConverter.Converters
         public void ConvertData(QueueMessage msg)
         {
             DocumentDb unfrouteDB = new DocumentDb("MyTripDb", "unformattedroute");
-            DocumentClient unfrouteClient = unfrouteDB.getClient();
+            DocumentClient unfrouteClient = unfrouteDB.Client;
 
             DocumentDb tripDB = new DocumentDb("MyTripDb", "trip");
-            DocumentClient tripDBClient = tripDB.getClient();
+            DocumentClient tripDBClient = tripDB.Client;
 
-            var trip = tripDBClient.CreateDocumentQuery<Trip>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == msg.tripId).FirstOrDefault();
+            var trip = tripDBClient.CreateDocumentQuery<Trip>(new Uri(tripDB.Collection.SelfLink)).Where(t => t.Id == msg.tripId).FirstOrDefault();
             
             try
             {
-                UnformattedRoute unfroute = unfrouteClient.CreateDocumentQuery<UnformattedRoute>(new Uri(unfrouteDB.getCollection().SelfLink))
+                UnformattedRoute unfroute = unfrouteClient.CreateDocumentQuery<UnformattedRoute>(new Uri(unfrouteDB.Collection.SelfLink))
                     .Where(t => t.Id == msg.routeId).FirstOrDefault();
 
                 if (unfroute != null)
@@ -42,14 +42,14 @@ namespace MediaConverter.Converters
                     }
                     trip.Route = route;
                     trip.RouteStatus = RouteStatus.Success;
-                    tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
+                    tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.Collection.SelfLink), trip);
                 }
             }
             catch(Exception e)
             {
                 Trace.TraceInformation("Failed to proccess unformattedroute {0} {1}", msg.routeId,e.ToString());
                 trip.RouteStatus = RouteStatus.InvalidFormat;
-                tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
+                tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.Collection.SelfLink), trip);
             }
         }
 

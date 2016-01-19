@@ -17,9 +17,9 @@ namespace MediaConverter.Converters
         public void ConvertData(QueueMessage msg)
         {
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient photoDBClient = photodb.getClient();
+            DocumentClient photoDBClient = photodb.Client;
 
-            var photo = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.getCollection().SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
+            var photo = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.Collection.SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
             photo.ThumbnailUrl = "https://mytripblob.blob.core.windows.net/photo/thumbnail-" + photo.Id + ".png";
             photo.Url = "https://mytripblob.blob.core.windows.net/photo/" + photo.Id + ".png";
             photo.Status = MediaStatus.Formatted;
@@ -47,7 +47,7 @@ namespace MediaConverter.Converters
 
 
 
-            photoDBClient.ReplaceDocumentAsync(new Uri(photodb.getCollection().SelfLink), photo);
+            photoDBClient.ReplaceDocumentAsync(new Uri(photodb.Collection.SelfLink), photo);
         }
 
     }

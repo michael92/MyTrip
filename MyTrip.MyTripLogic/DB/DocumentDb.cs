@@ -13,21 +13,24 @@ namespace MyTrip.MyTripLogic.DB
 {
     public class DocumentDb
     {
-        private static string _databaseId;
-        private static string _collectionId;
-        private static Database _database;
-        private static DocumentCollection _collection;
-        private static DocumentClient _client;
+        private string _databaseId;
+        private string _collectionId;
+        private Database _database;
+        private DocumentCollection _collection;
+        private DocumentClient _client;
 
         public DocumentDb(string database, string collection)
         {
             _databaseId = database;
             _collectionId = collection;
             ReadOrCreateDatabase().Wait();
-            ReadOrCreateCollection(_database.SelfLink).Wait();
+            if (collection != null)
+            {
+                ReadOrCreateCollection(_database.SelfLink).Wait();
+            }
         }
 
-        public static DocumentClient Client
+        public DocumentClient Client
         {
             get
             {
@@ -43,29 +46,12 @@ namespace MyTrip.MyTripLogic.DB
             }
         }
 
-        public DocumentClient getClient()
-        {
-            string endpoint = ConfigurationManager.AppSettings["endpoint"];
-            string authKey = ConfigurationManager.AppSettings["authKey"];
-
-            Uri endpointUri = new Uri(endpoint);
-            return new DocumentClient(endpointUri, authKey);
-
-        }
-
-        public DocumentCollection getCollection()
-        {
-            return _collection;
-        }
-
-        public static string Database = "MyTripDb";
-
-        protected static DocumentCollection Collection
+        public DocumentCollection Collection
         {
             get { return _collection; }
         }
 
-        private static async Task ReadOrCreateCollection(string databaseLink)
+        private async Task ReadOrCreateCollection(string databaseLink)
         {
             var collections = Client.CreateDocumentCollectionQuery(databaseLink)
                               .Where(col => col.Id == _collectionId).ToArray();
@@ -81,7 +67,7 @@ namespace MyTrip.MyTripLogic.DB
             }
         }
 
-        private static async Task ReadOrCreateDatabase()
+        private async Task ReadOrCreateDatabase()
         {
             var query = Client.CreateDatabaseQuery()
                             .Where(db => db.Id == _databaseId);
@@ -96,19 +82,19 @@ namespace MyTrip.MyTripLogic.DB
                 _database = await Client.CreateDatabaseAsync(new Microsoft.Azure.Documents.Database { Id = _databaseId });
             }
         }
-        public static List<Media> GetMedia(string id)
+        public List<Media> GetMedia(string id)
         {
             return Client.CreateDocumentQuery<Media>(Collection.DocumentsLink)
                         .Where(x => x.Id == id)
                        .AsEnumerable()
                        .ToList<Media>();
         }
-        public static async Task<Document> UpdateItemAsync(Media item)
+        public async Task<Document> UpdateItemAsync(Media item)
         {
             Document doc = GetDocument(item.Id);
             return await Client.ReplaceDocumentAsync(doc.SelfLink, item);
         }
-        public static Document GetDocument(string id)
+        public Document GetDocument(string id)
         {
             return Client.CreateDocumentQuery(Collection.DocumentsLink)
                           .Where(d => d.Id == id)

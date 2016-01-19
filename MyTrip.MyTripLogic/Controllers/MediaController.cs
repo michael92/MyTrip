@@ -108,9 +108,9 @@ namespace MyTrip.MyTripLogic.Controllers
         {
 
             DocumentDb tripDB = new DocumentDb("MyTripDb", "photo");
-            DocumentClient tripDBClient = tripDB.getClient();
+            DocumentClient tripDBClient = tripDB.Client;
 
-            var photo = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == photoId).FirstOrDefault();
+            var photo = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.Collection.SelfLink)).Where(t => t.Id == photoId).FirstOrDefault();
             if (photo != null)
             {
                 await tripDBClient.DeleteDocumentAsync(photo.SelfLink);
@@ -128,9 +128,9 @@ namespace MyTrip.MyTripLogic.Controllers
         public async Task<IHttpActionResult> deleteMovie([FromUri] string movieId)
         {
             DocumentDb tripDB = new DocumentDb("MyTripDb", "movie");
-            DocumentClient tripDBClient = tripDB.getClient();
+            DocumentClient tripDBClient = tripDB.Client;
 
-            var movie = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == movieId).FirstOrDefault();
+            var movie = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.Collection.SelfLink)).Where(t => t.Id == movieId).FirstOrDefault();
             if(movie!= null)
             {
                 await tripDBClient.DeleteDocumentAsync(movie.SelfLink);

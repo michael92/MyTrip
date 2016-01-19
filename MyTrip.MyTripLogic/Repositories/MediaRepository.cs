@@ -34,9 +34,9 @@ namespace MyTrip.MyTripLogic.Repositories
             m.TripId = tripId;
             m.ThumbnailUrl = thumbnailUrl;
             m.Status = MediaStatus.Formatting;
-            DocumentClient dc = photodb.getClient();
+            DocumentClient dc = photodb.Client;
 
-            var doc = await dc.CreateDocumentAsync(photodb.getCollection().SelfLink, m);
+            var doc = await dc.CreateDocumentAsync(photodb.Collection.SelfLink, m);
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("photo");
@@ -53,9 +53,9 @@ namespace MyTrip.MyTripLogic.Repositories
             m.TripId = tripId;
             m.ThumbnailUrl = thumbnailUrl;
             m.Status = MediaStatus.Formatting;
-            DocumentClient dc = moviedb.getClient();
+            DocumentClient dc = moviedb.Client;
 
-            var doc = await dc.CreateDocumentAsync(moviedb.getCollection().SelfLink, m);
+            var doc = await dc.CreateDocumentAsync(moviedb.Collection.SelfLink, m);
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("movie");
@@ -66,9 +66,9 @@ namespace MyTrip.MyTripLogic.Repositories
         public IEnumerable<Media> GetPhotos(string tripId)
         {
             DocumentDb documentDb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient dc = documentDb.getClient();
+            DocumentClient dc = documentDb.Client;
 
-            var photos = dc.CreateDocumentQuery<Media>(documentDb.getCollection().DocumentsLink)
+            var photos = dc.CreateDocumentQuery<Media>(documentDb.Collection.DocumentsLink)
                 .AsEnumerable()
                 .Where(t => t.Id == tripId)
                 .ToList();
@@ -79,9 +79,9 @@ namespace MyTrip.MyTripLogic.Repositories
         public IEnumerable<Media> GetMovies(string tripId)
         {
             DocumentDb documentDb = new DocumentDb("MyTripDb", "movie");
-            var dc = documentDb.getClient();
+            var dc = documentDb.Client;
 
-            var movies = dc.CreateDocumentQuery<Media>(documentDb.getCollection().DocumentsLink)
+            var movies = dc.CreateDocumentQuery<Media>(documentDb.Collection.DocumentsLink)
                 .AsEnumerable()
                 .Where(t => t.Id == tripId)
                 .ToList();
