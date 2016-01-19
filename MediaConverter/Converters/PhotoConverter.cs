@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -19,7 +20,11 @@ namespace MediaConverter.Converters
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
             DocumentClient photoDBClient = photodb.Client;
 
-            var photo = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.Collection.SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
+            var photo = photoDBClient.CreateDocumentQuery<Media>(photodb.Collection.DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl)
+                .FirstOrDefault();
+
             photo.ThumbnailUrl = "https://filmsphotos.blob.core.windows.net/photo/thumbnail-" + photo.Id + ".png";
             photo.Url = "https://filmsphotos.blob.core.windows.net/photo/" + photo.Id + ".png";
             photo.Status = MediaStatus.Formatted;
@@ -45,9 +50,8 @@ namespace MediaConverter.Converters
             CloudBlockBlob blockBlobUploadThumb = container.GetBlockBlobReference("thumbnail-" + photo.Id + ".png");
             blockBlobUploadThumb.UploadFromByteArray(thumb.ToArray(), 0, (int)thumb.Length);
 
-
-
-            photoDBClient.ReplaceDocumentAsync(new Uri(photodb.Collection.SelfLink), photo);
+            var doc = photodb.GetDocument(photo.Id);
+            photoDBClient.ReplaceDocumentAsync(doc.SelfLink, photo);
         }
 
     }
