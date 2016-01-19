@@ -47,7 +47,7 @@ namespace MyTrip.MyTripLogic.Controllers
                 if (hpf.ContentLength > 0)
                 {
                     string id = Guid.NewGuid().ToString();
-                    var document = await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id);
+                    var document = await _repo.CreatePhoto(id, "https://filmsphotos.blob.core.windows.net/photo/" + id, tripId, "https://filmsphotos.blob.core.windows.net/photo/" + id);
                     _repo.CreatePhotoInBlob(id, hpf.InputStream);
                     _repo.SendPhotoToQueue(id, tripId);
                     
@@ -78,7 +78,7 @@ namespace MyTrip.MyTripLogic.Controllers
                     if (hpf.ContentLength > 0)
                     {
                         string id = Guid.NewGuid().ToString();
-                        var document = await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id);
+                        var document = await _repo.CreateMovie(id, "https://filmsphotos.blob.core.windows.net/movie/" + id, tripId, "https://filmsphotos.blob.core.windows.net/movie/" + id);
                         _repo.CreateMovieInBlob(id, hpf.InputStream);
                         _repo.SendMovieToQueue(id, tripId);
                         

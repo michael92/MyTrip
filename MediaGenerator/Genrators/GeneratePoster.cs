@@ -64,7 +64,7 @@ namespace MediaGenerator.Generators
                     DocumentClient posterDBClient = posterdb.Client;
                     Poster p = new Poster();
                     p.Id = Guid.NewGuid().ToString();
-                    p.Url = "https://mytripblob.blob.core.windows.net/photo/poster-" + p.Id;
+                    p.Url = "https://filmsphotos.blob.core.windows.net/photo/poster-" + p.Id;
                     p.TripId = trip.Id;
                     p.PosterStatus = PosterStatus.Generated;
                     p.CreationDate = DateTime.Now;

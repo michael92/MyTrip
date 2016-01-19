@@ -137,7 +137,7 @@ namespace MyTrip.MyTripLogic.Repositories
             QueueMessage qm = new QueueMessage();
             qm.tripId = tripId;
             qm.taskType = QueueTaskType.ConvertPhoto;
-            qm.url = "https://mytripblob.blob.core.windows.net/photo/" + photoId;
+            qm.url = "https://filmsphotos.blob.core.windows.net/photo/" + photoId;
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
             CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
             CloudQueue queue = queueClient.GetQueueReference("converter");
@@ -151,7 +151,7 @@ namespace MyTrip.MyTripLogic.Repositories
             QueueMessage qm = new QueueMessage();
             qm.tripId = tripId;
             qm.taskType = QueueTaskType.ConvertMovie;
-            qm.url = "https://mytripblob.blob.core.windows.net/movie/" + movieId;
+            qm.url = "https://filmsphotos.blob.core.windows.net/movie/" + movieId;
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
             CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
             CloudQueue queue = queueClient.GetQueueReference("converter");

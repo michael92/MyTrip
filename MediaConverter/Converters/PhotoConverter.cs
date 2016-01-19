@@ -20,8 +20,8 @@ namespace MediaConverter.Converters
             DocumentClient photoDBClient = photodb.Client;
 
             var photo = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.Collection.SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
-            photo.ThumbnailUrl = "https://mytripblob.blob.core.windows.net/photo/thumbnail-" + photo.Id + ".png";
-            photo.Url = "https://mytripblob.blob.core.windows.net/photo/" + photo.Id + ".png";
+            photo.ThumbnailUrl = "https://filmsphotos.blob.core.windows.net/photo/thumbnail-" + photo.Id + ".png";
+            photo.Url = "https://filmsphotos.blob.core.windows.net/photo/" + photo.Id + ".png";
             photo.Status = MediaStatus.Formatted;
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));

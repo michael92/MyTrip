@@ -22,7 +22,7 @@ namespace MediaConverter.Converters
             var movie = movieDBClient.CreateDocumentQuery<Media>(new Uri(moviedb.Collection.SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
             // movie.ThumbnailUrl = "thumbnail-" + movie.Id + ".png";
             movie.ThumbnailUrl = null;
-            movie.Url = "https://mytripblob.blob.core.windows.net/movie/" + movie.Id + ".avi";
+            movie.Url = "https://filmsphotos.blob.core.windows.net/movie/" + movie.Id + ".avi";
             movie.Status = MediaStatus.Formatted;
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));
