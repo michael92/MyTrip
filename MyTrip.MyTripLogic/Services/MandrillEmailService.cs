@@ -73,11 +73,8 @@ namespace MyTrip.MyTripLogic.Services
 
             queryString["userid"] = userId;
             queryString["token"] = token;
-
-            var ub = new UriBuilder(passwordResetUrl);
-            ub.Query = queryString.ToString();
-
-            return ub.ToString();
+            
+            return passwordResetUrl + "?" + queryString.ToString();
         }
     }
 }

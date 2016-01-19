@@ -28,7 +28,7 @@ namespace MyTrip.MyTripLogic.Repositories
             this.userStore= new DocumentDBUserStore<MyTripUser>(identityCollectionManager, identityRoleStore);
 
             manager = new UserManager<MyTripUser>(userStore);
-            var provider = new DpapiDataProtectionProvider("MyTrip");
+            var provider = Startup.DataProtectionProvider;
             manager.UserTokenProvider = new DataProtectorTokenProvider<MyTripUser, string>(provider.Create("EmailConfirmation"));
         }
 
