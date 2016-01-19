@@ -21,26 +21,24 @@ namespace MediaGenerator.Generators
         public void GenerateData(QueueMessage msg)
         {
             DocumentDb tripdb = new DocumentDb("MyTripDb", "trip");
-            DocumentClient tripDBClient = tripdb.getClient();
-            var trip = tripDBClient.CreateDocumentQuery<Trip>(new Uri(tripdb.getCollection().SelfLink)).Where(t => t.Id == msg.tripId).FirstOrDefault();
+            DocumentClient tripDBClient = tripdb.Client;
+            var trip = tripDBClient.CreateDocumentQuery<Trip>(new Uri(tripdb.Collection.SelfLink)).Where(t => t.Id == msg.tripId).FirstOrDefault();
 
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient photoDBClient = photodb.getClient();
-            var photos = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.getCollection().SelfLink)).Where(t => t.Id == msg.tripId).ToList();
+            DocumentClient photoDBClient = photodb.Client;
+            var photos = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.Collection.SelfLink)).Where(t => t.Id == msg.tripId).ToList();
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));
             CloudBlobClient blobClientDownload = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClientDownload.GetContainerReference("photo");
 
-            //todo: dodać generowanie plakatu
-
-
+           
             using (WebClient wc = new WebClient())
             {
-                Stream mapStream = wc.OpenRead(GenerateRoute(trip.Route));
+                Stream mapStream = wc.OpenRead(GenerateMap(trip.Route));
                 StreamReader sr = new StreamReader(mapStream);
 
-                Image newImage = Image.FromStream(sr.BaseStream);
+                Image mapImage = Image.FromStream(sr.BaseStream);
                 Bitmap b = new Bitmap(650, 700);
                 using (Graphics g = Graphics.FromImage(b))
                 {
@@ -49,7 +47,7 @@ namespace MediaGenerator.Generators
                     //nazwa
                     g.DrawString(trip.Name, new Font(FontFamily.GenericSansSerif, 50, FontStyle.Regular), new SolidBrush(Color.Black), 15, 25);
                     //mapa
-                    g.DrawImage(newImage, 0, 100, 650, 300);
+                    g.DrawImage(mapImage, 0, 100, 650, 300);
                     //miniaturki
                     for (int i = 1; i <= photos.Count; i++)
                     {
@@ -63,9 +61,9 @@ namespace MediaGenerator.Generators
 
 
                     DocumentDb posterdb = new DocumentDb("MyTripDb", "poster");
-                    DocumentClient posterDBClient = posterdb.getClient();
+                    DocumentClient posterDBClient = posterdb.Client;
                     Poster p = new Poster();
-                    p.Id = new Guid();
+                    p.Id = Guid.NewGuid().ToString();
                     p.Url = "https://mytripblob.blob.core.windows.net/photo/poster-" + p.Id;
                     p.TripId = trip.Id;
                     p.PosterStatus = PosterStatus.Generated;
@@ -84,12 +82,12 @@ namespace MediaGenerator.Generators
            
         }
 
-        public string GenerateRoute(Route r)
+        public string GenerateMap(Route r)
         {
             var point = "";
             for(int i=1;i<= r.points.Count;i++)
             {
-                point = @"markers=size:mid%7Ccolor:0xff0000%7Clabel:"+i+ "%7C"+r.points[i].city;
+                point += @"markers=size:mid%7Ccolor:0xff0000%7Clabel:"+i+ "%7C"+r.points[i].city;
             }
             string url =
                mapGoogle
