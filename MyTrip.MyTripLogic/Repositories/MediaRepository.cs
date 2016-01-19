@@ -77,7 +77,7 @@ namespace MyTrip.MyTripLogic.Repositories
 
             var photos = dc.CreateDocumentQuery<Media>(documentDb.Collection.DocumentsLink)
                 .AsEnumerable()
-                .Where(t => t.Id == tripId)
+                .Where(t => t.TripId == tripId)
                 .ToList();
 
             return photos;
@@ -90,46 +90,58 @@ namespace MyTrip.MyTripLogic.Repositories
 
             var movies = dc.CreateDocumentQuery<Media>(documentDb.Collection.DocumentsLink)
                 .AsEnumerable()
-                .Where(t => t.Id == tripId)
+                .Where(t => t.TripId == tripId)
                 .ToList();
 
             return movies;
         }
 
-        public async void DeletePhoto(string photoId)
+        public async Task DeletePhoto(string photoId)
         {
             DocumentDb tripDB = new DocumentDb("MyTripDb", "photo");
             DocumentClient tripDBClient = tripDB.Client;
 
-            var photo = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.Collection.SelfLink))
+            var photo = tripDBClient.CreateDocumentQuery<Document>(tripDB.Collection.DocumentsLink)
+                .AsEnumerable()
                 .Where(t => t.Id == photoId)
                 .FirstOrDefault();
             if (photo != null)
             {
                 await tripDBClient.DeleteDocumentAsync(photo.SelfLink);
+
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
+                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+                CloudBlobContainer container = blobClient.GetContainerReference("photo");
+
+                CloudBlockBlob blob = container.GetBlockBlobReference(photo.GetPropertyValue<String>("Url"));
+                blob.DeleteIfExists();
+
+                CloudBlockBlob thumbblob = container.GetBlockBlobReference(photo.GetPropertyValue<String>("ThumbnailUrl"));
+                thumbblob.DeleteIfExists();
             }
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("photo");
-            CloudBlockBlob blob = container.GetBlockBlobReference(photo.GetPropertyValue<String>("Url"));
-            blob.DeleteIfExists();
         }
 
-        public async void DeleteMovie(string movieId)
+        public async Task DeleteMovie(string movieId)
         {
             DocumentDb tripDB = new DocumentDb("MyTripDb", "movie");
             DocumentClient tripDBClient = tripDB.Client;
 
-            var movie = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.Collection.SelfLink)).Where(t => t.Id == movieId).FirstOrDefault();
+            var movie = tripDBClient.CreateDocumentQuery<Document>(tripDB.Collection.DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == movieId)
+                .FirstOrDefault();
             if (movie != null)
             {
                 await tripDBClient.DeleteDocumentAsync(movie.SelfLink);
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
+                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+                CloudBlobContainer container = blobClient.GetContainerReference("movie");
+                CloudBlockBlob blob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("Url"));
+                blob.DeleteIfExists();
+
+                CloudBlockBlob thumbblob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("ThumbnailUrl"));
+                thumbblob.DeleteIfExists();
             }
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("movie");
-            CloudBlockBlob blob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("Url"));
-            blob.DeleteIfExists();
         }
 
         public void SendPhotoToQueue(string photoId, string tripId)

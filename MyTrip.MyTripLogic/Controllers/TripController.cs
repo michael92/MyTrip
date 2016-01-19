@@ -46,16 +46,13 @@ namespace MyTrip.MyTripLogic.Controllers
             _repo.EditTrip(id, name, description, isPublic);
             return Ok();
         }
-
+        
         [Route("editRoute")]
-        public IHttpActionResult EditRoute([FromUri]string id, [FromBody]FormDataCollection formData)
+        public IHttpActionResult EditRoute([FromUri]string id, [FromBody]Route route)
         {
-            var route = formData["route"];
-            Route routeObj = null;
             if (route != null)
             {
-                routeObj = new JavaScriptSerializer().Deserialize<Route>(route);
-                _repo.EditRoute(id, routeObj);
+                _repo.EditRoute(id, route);
                 return Ok();
             }
             else

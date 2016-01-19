@@ -94,7 +94,7 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("deletePhoto")]
         public async Task<IHttpActionResult> deletePhoto([FromUri] string photoId)
         {
-            _repo.DeletePhoto(photoId);
+            await _repo.DeletePhoto(photoId);
             return Ok();
         }
 
@@ -102,7 +102,7 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("deleteMovie")]
         public async Task<IHttpActionResult> deleteMovie([FromUri] string movieId)
         {
-            _repo.DeleteMovie(movieId);
+            await _repo.DeleteMovie(movieId);
             return Ok();
         }
 
