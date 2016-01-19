@@ -31,9 +31,8 @@ namespace MyTrip.MyTripLogic.Controllers
         {
             var userName = User.Identity.Name;
             var userId = User.Identity.GetUserId();
-
-            var tripId = Guid.NewGuid().ToString();
-            _repo.CreateTrip(userId, tripId, name, description, isPublic);
+            var createdDocument = await _repo.CreateTrip(userId, name, description, isPublic);
+            var tripId = createdDocument.Id;
 
             string sPath = "";
             sPath = System.Web.Hosting.HostingEnvironment.MapPath("~/Uploads");
@@ -51,8 +50,9 @@ namespace MyTrip.MyTripLogic.Controllers
                         using (StreamReader sr = new StreamReader(hpf.InputStream))
                         {
                             string line = sr.ReadToEnd();
-                            await _repo.Create(line, tripId);
+                            var createdRoute = await _repo.CreateUnformattedRoute(line, tripId);
                             QueueMessage qm = new QueueMessage();
+                            qm.routeId = createdRoute.Id;
                             qm.tripId = tripId;
                             qm.taskType = QueueTaskType.ConvertRoute;
                             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
