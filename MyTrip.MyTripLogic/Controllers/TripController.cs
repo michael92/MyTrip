@@ -12,6 +12,7 @@ using System.Configuration;
 using Microsoft.WindowsAzure.Storage.Queue;
 using System.Net.Http.Formatting;
 using System.Web.Script.Serialization;
+using System.Threading.Tasks;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
@@ -61,18 +62,13 @@ namespace MyTrip.MyTripLogic.Controllers
             }
         }
 
-        [Route("generatePoster")]
-        public IHttpActionResult GeneratePoster([FromUri] string tripId)
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("getPoster")]
+        public async Task<IHttpActionResult> GetPoster([FromUri] string tripId)
         {
-            QueueMessage qm = new QueueMessage();
-            qm.tripId = tripId;
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
-            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-            CloudQueue queue = queueClient.GetQueueReference("posterQueue");
-            queue.CreateIfNotExists();
-            CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
-            queue.AddMessage(message);
-            return Ok();
+            var poster = await _repo.GetPosterByTripId(tripId);
+            return Ok(poster);
         }
 
     }

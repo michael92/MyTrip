@@ -8,6 +8,8 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using MyTrip.MyTripLogic.Models;
 using MyTrip.MyTripLogic.DB;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace MyTrip.MyTripLogic.Repositories
 {
@@ -90,6 +92,54 @@ namespace MyTrip.MyTripLogic.Repositories
             Document doc = tripDb.GetDocument(id);
             var client = tripDb.Client;
             client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
+        }
+
+        public async Task<Poster> GetPosterByTripId(string tripId)
+        {
+            DocumentDb db = new DocumentDb("MyTripDb", "poster");
+            DocumentClient dc = db.Client;
+
+            var poster = dc.CreateDocumentQuery<Poster>(db.Collection.DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.TripId == tripId)
+                .FirstOrDefault();
+
+            if (poster == null)
+            {
+                poster = await CreatePoster(tripId);
+                AddGeneratingPosterToQueue(tripId);
+            }
+
+            return poster;
+        }
+
+        private async Task<Poster> CreatePoster(string tripId)
+        {
+            Poster poster = new Poster
+            {
+                TripId = tripId,
+                PosterStatus = PosterStatus.Generating,
+            };
+
+            DocumentDb db = new DocumentDb("MyTripDb", "poster");
+            DocumentClient dc = db.Client;
+            var doc = await dc.CreateDocumentAsync(db.Collection.SelfLink, poster);
+
+            poster.Id = doc.Resource.Id;
+            return poster;
+        }
+
+        private void AddGeneratingPosterToQueue(string tripId)
+        {
+            QueueMessage qm = new QueueMessage();
+            qm.tripId = tripId;
+            qm.taskType = QueueTaskType.GeneratePoster;
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+            CloudQueue queue = queueClient.GetQueueReference("posterQueue");
+            queue.CreateIfNotExists();
+            CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
+            queue.AddMessage(message);
         }
 
     }
