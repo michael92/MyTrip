@@ -120,19 +120,7 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("deleteMovie")]
         public async Task<IHttpActionResult> deleteMovie([FromUri] string movieId)
         {
-            DocumentDb tripDB = new DocumentDb("MyTripDb", "movie");
-            DocumentClient tripDBClient = tripDB.Client;
-
-            var movie = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.Collection.SelfLink)).Where(t => t.Id == movieId).FirstOrDefault();
-            if(movie!= null)
-            {
-                await tripDBClient.DeleteDocumentAsync(movie.SelfLink);
-            }
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("movie");
-            CloudBlockBlob blob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("Url"));
-            blob.DeleteIfExists();
+            _repo.DeleteMovie(movieId);
             return Ok();
         }
 
