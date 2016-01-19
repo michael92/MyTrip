@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -7,6 +8,7 @@ namespace MyTrip.MyTripLogic.Models
 {
     public class Trip
     {
+        [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
         public DateTime Date { get; set; }

@@ -41,14 +41,15 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("editTrip")]
         public IHttpActionResult EditTrip([FromUri] string id, [FromUri] string name = null, [FromUri] string description = null, [FromUri] bool? isPublic = null)
         {
-            //TODO
+            _repo.EditTrip(id, name, description, isPublic);
             return Ok();
         }
 
-        [Route("getMediaList")]
-        public IHttpActionResult GetPhotosAndMovies([FromUri] string tripId)
+        [Route("editRoute")]
+        public IHttpActionResult EditRoute([FromUri] string id, [FromUri] Route route)
         {
-            return Ok(_repo.GetPhotosAndMovies(tripId));
+            _repo.EditRoute(id, route);
+            return Ok();
         }
 
         [Route("generatePoster")]

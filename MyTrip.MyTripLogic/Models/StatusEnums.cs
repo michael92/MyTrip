@@ -17,4 +17,10 @@ namespace MyTrip.MyTripLogic.Models
         Formatting,
         Formatted
     }
+
+    public enum PosterStatus
+    {
+        Generating,
+        Generated
+    }
 }

@@ -16,34 +16,49 @@ namespace MyTrip.MyTripLogic.Repositories
         public IEnumerable<Trip> GetTrips(int limit, int offset, string userId, bool isPublic)
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
-            DocumentClient dc = tripDb.getClient();
-            var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+            DocumentClient dc = tripDb.Client;
+            if (isPublic)
+            {
+                var result = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
                 .AsEnumerable()
-                .Where(t => t.UserId == userId && t.IsPublic == isPublic)
+                .Where(t => t.IsPublic == isPublic)
                 .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
                 .OrderByDescending(t => t.Date)
                 .Skip(offset)
                 .Take(limit)
                 .ToList();
-            return result;
+                return result;
+            }
+            else
+            {
+                var result = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.UserId == userId)
+                .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
+                .OrderByDescending(t => t.Date)
+                .Skip(offset)
+                .Take(limit)
+                .ToList();
+                return result;
+            }
         }
 
         public Trip GetTrip(string id)
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
-            DocumentClient dc = tripDb.getClient();
-            var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+            DocumentClient dc = tripDb.Client;
+            var result = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
                 .AsEnumerable()
                 .Where(t => t.Id == id)
                 .FirstOrDefault();
             return result;
         }
 
-        public async void EditTrip(string id, string name, string description, bool? isPublic = null)
+        public void EditTrip(string id, string name, string description, bool? isPublic = null)
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
-            DocumentClient dc = tripDb.getClient();
-            var trip = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+            DocumentClient dc = tripDb.Client;
+            var trip = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
                 .AsEnumerable()
                 .Where(t => t.Id == id)
                 .FirstOrDefault();
@@ -54,22 +69,27 @@ namespace MyTrip.MyTripLogic.Repositories
                 trip.Description = description ?? trip.Description;
                 trip.IsPublic = isPublic ?? trip.IsPublic;
             }
-            Document doc = tripDb.GetDocumentById(id);
-            var client = tripDb.getClient();
-            await client.ReplaceDocumentAsync(doc.SelfLink, trip);
+            Document doc = tripDb.GetDocument(id);
+            var client = tripDb.Client;
+            client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
         }
 
-        public IEnumerable<Media> GetPhotosAndMovies(string tripId)
+        public void EditRoute(string id, Route route)
         {
-            // TODO: Poprawić na implementację jak wyżej
-            // Ta nie działa !!!
-            DocumentDb tripDb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient dc = tripDb.getClient();
-            var photos = dc.CreateDocumentQuery<Media>(new Uri(tripDb.getCollection().SelfLink)).Where(t => t.TripId == tripId);
-            tripDb = new DocumentDb("MyTripDb", "movie");
-            dc = tripDb.getClient();
-            var movies = dc.CreateDocumentQuery<Media>(new Uri(tripDb.getCollection().SelfLink)).Where(t => t.TripId == tripId);
-            return photos.Concat(movies);
+            DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
+            DocumentClient dc = tripDb.Client;
+            var trip = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == id)
+                .FirstOrDefault();
+
+            if (trip != null)
+            {
+                trip.Route = route;
+            }
+            Document doc = tripDb.GetDocument(id);
+            var client = tripDb.Client;
+            client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
         }
 
     }

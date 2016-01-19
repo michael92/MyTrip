@@ -20,6 +20,7 @@ using System.Web.Http;
 namespace MyTrip.MyTripLogic.Controllers
 {
     [RoutePrefix("api/Media")]
+    [Authorize]
     public class MediaController : ApiController
     {
         private readonly MediaRepository _repo;
@@ -31,7 +32,7 @@ namespace MyTrip.MyTripLogic.Controllers
 
         [HttpPost]
         [Route("addPhoto")]
-        public async Task<IHttpActionResult> addPhoto([FromUri] string id, [FromUri] string tripId)
+        public async Task<IHttpActionResult> addPhoto([FromUri] string tripId)
         {
 
             string sPath = "";
@@ -45,18 +46,12 @@ namespace MyTrip.MyTripLogic.Controllers
 
                 if (hpf.ContentLength > 0)
                 {
-                    await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id, hpf.InputStream);
-                    QueueMessage qm = new QueueMessage();
-                    qm.tripId = tripId;
-                    qm.taskType = QueueTaskType.ConvertPhoto;
-                    qm.url = "https://mytripblob.blob.core.windows.net/photo/" + id;
-                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
-                    CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-                    CloudQueue queue = queueClient.GetQueueReference("converter");
-                    queue.CreateIfNotExists();
-                    CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
-                    queue.AddMessage(message);
-                    return Ok();
+                    string id = Guid.NewGuid().ToString();
+                    var document = await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id);
+                    _repo.CreatePhotoInBlob(id, hpf.InputStream);
+                    _repo.SendPhotoToQueue(id, tripId);
+                    
+                    return Ok(id);
                 }
             }
 
@@ -65,7 +60,7 @@ namespace MyTrip.MyTripLogic.Controllers
 
         [HttpPost]
         [Route("addMovie")]
-        public async Task<IHttpActionResult> addMovie([FromUri] string id, [FromUri] string tripId)
+        public async Task<IHttpActionResult> addMovie([FromUri] string tripId)
         {
 
             string sPath = "";
@@ -82,18 +77,12 @@ namespace MyTrip.MyTripLogic.Controllers
 
                     if (hpf.ContentLength > 0)
                     {
-                        await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id, hpf.InputStream);
-                        QueueMessage qm = new QueueMessage();
-                        qm.tripId = tripId;
-                        qm.taskType = QueueTaskType.ConvertMovie;
-                        qm.url = "https://mytripblob.blob.core.windows.net/movie/" + id;
-                        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
-                        CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-                        CloudQueue queue = queueClient.GetQueueReference("converter");
-                        queue.CreateIfNotExists();
-                        CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
-                        queue.AddMessage(message);
-                        return Ok();
+                        string id = Guid.NewGuid().ToString();
+                        var document = await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id);
+                        _repo.CreateMovieInBlob(id, hpf.InputStream);
+                        _repo.SendMovieToQueue(id, tripId);
+                        
+                        return Ok(id);
                     }
                 }
             }
@@ -105,20 +94,7 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("deletePhoto")]
         public async Task<IHttpActionResult> deletePhoto([FromUri] string photoId)
         {
-
-            DocumentDb tripDB = new DocumentDb("MyTripDb", "photo");
-            DocumentClient tripDBClient = tripDB.getClient();
-
-            var photo = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == photoId).FirstOrDefault();
-            if (photo != null)
-            {
-                await tripDBClient.DeleteDocumentAsync(photo.SelfLink);
-            }
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("photo");
-            CloudBlockBlob blob = container.GetBlockBlobReference(photo.GetPropertyValue<String>("Url"));
-            blob.DeleteIfExists();
+            _repo.DeletePhoto(photoId);
             return Ok();
         }
 
@@ -126,23 +102,23 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("deleteMovie")]
         public async Task<IHttpActionResult> deleteMovie([FromUri] string movieId)
         {
-            DocumentDb tripDB = new DocumentDb("MyTripDb", "movie");
-            DocumentClient tripDBClient = tripDB.getClient();
-
-            var movie = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == movieId).FirstOrDefault();
-            if(movie!= null)
-            {
-                await tripDBClient.DeleteDocumentAsync(movie.SelfLink);
-            }
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("movie");
-            CloudBlockBlob blob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("Url"));
-            blob.DeleteIfExists();
+            _repo.DeleteMovie(movieId);
             return Ok();
         }
 
+        [HttpGet]
+        [Route("getPhotos")]
+        public IHttpActionResult GetPhotos([FromUri] string tripId)
+        {
+            return Ok(_repo.GetPhotos(tripId));
+        }
 
+        [HttpGet]
+        [Route("getMovies")]
+        public IHttpActionResult GetMovies([FromUri] string tripId)
+        {
+            return Ok(_repo.GetMovies(tripId));
+        }
 
     }
 }

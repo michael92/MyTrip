@@ -6,14 +6,20 @@ using System.Web;
 
 namespace MyTrip.MyTripLogic.Models
 {
-    public class UnformattedRoute
+    public class Poster
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
+        public DateTime CreationDate { get; set; }
+
+        public PosterStatus PosterStatus { get; set; }
+
         public string TripId { get; set; }
 
-        public string Route { get; set; }
+        public string Url { get; set; }
+
+      
 
     }
 }

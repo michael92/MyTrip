@@ -77,6 +77,7 @@ namespace MediaConverter
 
                     if (msg != null)
                     {
+                        Trace.TraceError("Got message: '{0}'", msg.AsString);
                         this.ProcessQueueMessage(msg); 
                     }
                     else
@@ -102,7 +103,7 @@ namespace MediaConverter
 
         private void ProcessQueueMessage(CloudQueueMessage msg)
         {
-            Trace.TraceInformation("Processing queue message {0}", msg);
+            Trace.TraceError("Deserizalizing queue message {0}", msg);
             QueueMessage parsedMsg = QueueMessage.DeserializeMessage(msg);
 
             IConverter converter = null;
@@ -110,12 +111,15 @@ namespace MediaConverter
             switch (parsedMsg.taskType)
             {
                 case QueueTaskType.ConvertMovie:
+                    Trace.TraceError("Movie converter");
                     converter = new MovieConverter();
                     break;
                 case QueueTaskType.ConvertPhoto:
+                    Trace.TraceError("Photo converter {0}");
                     converter = new PhotoConverter();
                     break;
                 case QueueTaskType.ConvertRoute:
+                    Trace.TraceError("Route converter {0}");
                     converter = new RouteConverter(); 
                     break;
                 default:
@@ -124,6 +128,7 @@ namespace MediaConverter
 
             if(converter != null)
             {
+                Trace.TraceError("Converting {0}", msg);
                 converter.ConvertData(parsedMsg);
                 this.queue.DeleteMessage(msg);
             }            

@@ -18,10 +18,12 @@ namespace MyTrip.MyTripLogic.Repositories
     {
         private readonly DocumentDBUserStore<MyTripUser> userStore;
         private readonly UserManager<MyTripUser> manager;
+        private DocumentDb document;
 
         public AuthRepository() 
         {
-            var identityCollectionManager= new IdentityCollectionManager<MyTripUser>(DocumentDb.Client, DocumentDb.Database, true);
+            document = new DocumentDb("MyTripDb", null);
+            var identityCollectionManager= new IdentityCollectionManager<MyTripUser>(document.Client, "MyTripDb", true);
             var identityRoleStore = new IdentityRoleStore();
             this.userStore= new DocumentDBUserStore<MyTripUser>(identityCollectionManager, identityRoleStore);
 

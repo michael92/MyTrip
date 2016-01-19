@@ -1,6 +1,9 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using MyTrip.MyTripLogic.DB;
 using MyTrip.MyTripLogic.Models;
+using MyTrip.MyTripLogic.Repositories;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -13,18 +16,26 @@ namespace MediaConverter.Converters
         public static string APIKey = "AIzaSyC0sQ1pLDtQM7atcDpfJfmjD2TWLYf-jn0";
         public void ConvertData(QueueMessage msg)
         {
-            DocumentDb unfrouteDB = new DocumentDb("MyTripDb", "unformattedroute");
-            DocumentClient unfrouteClient = unfrouteDB.getClient();
+            Trace.TraceError("Connecting to documentdb unformattedroute ");
+            DocumentDb unfrouteDB = new DocumentDb("MyTripDb", "unformattedroutes");
+            DocumentClient unfrouteClient = unfrouteDB.Client;
 
+            Trace.TraceError("Connecting to documentdb trip");
             DocumentDb tripDB = new DocumentDb("MyTripDb", "trip");
-            DocumentClient tripDBClient = tripDB.getClient();
+            DocumentClient tripDBClient = tripDB.Client;
+            TripRepository tripRepo = new TripRepository();
 
-            var trip = tripDBClient.CreateDocumentQuery<Trip>(new Uri(tripDB.getCollection().SelfLink)).Where(t => t.Id == msg.tripId).FirstOrDefault();
-            
+            Trace.TraceError("Getting trip {0} ",msg.tripId);
+            var trip = tripRepo.GetTrip(msg.tripId);
+            Document doc = tripDB.GetDocument(trip.Id);
+
             try
             {
-                UnformattedRoute unfroute = unfrouteClient.CreateDocumentQuery<UnformattedRoute>(new Uri(unfrouteDB.getCollection().SelfLink))
-                    .Where(t => t.Id == msg.routeId).FirstOrDefault();
+                Trace.TraceError("Getting unformatted route {0} ", msg.tripId);
+                UnformattedRoute unfroute = unfrouteClient.CreateDocumentQuery<UnformattedRoute>(unfrouteDB.Collection.DocumentsLink)
+                    .AsEnumerable()
+                    .Where(t => t.Id == msg.routeId)
+                    .FirstOrDefault();
 
                 if (unfroute != null)
                 {
@@ -33,7 +44,7 @@ namespace MediaConverter.Converters
 
                     if (gpx != null)
                     {
-                        Trace.TraceInformation("GPX route format {)}", msg.routeId);
+                        Trace.TraceInformation("GPX route format {0})}", msg.routeId);
                         route = this.ParseGpxRoute(gpx,unfroute);
                     }
                     else
@@ -41,12 +52,15 @@ namespace MediaConverter.Converters
                         route = this.ParseRoute(unfroute);
                     }
                     trip.Route = route;
-                    tripDBClient.ReplaceDocumentAsync(new Uri(tripDB.getCollection().SelfLink), trip);
+                    trip.RouteStatus = RouteStatus.Success;
+                    tripDBClient.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
                 }
             }
             catch(Exception e)
             {
-                Trace.TraceInformation("Failed to proccess unformattedroute {0} {1}", msg.routeId,e.ToString());
+                Trace.TraceError("Failed to proccess unformattedroute {0} {1}", msg.routeId,e.ToString());
+                trip.RouteStatus = RouteStatus.InvalidFormat;
+                tripDBClient.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
             }
         }
 
@@ -58,7 +72,7 @@ namespace MediaConverter.Converters
             }
             catch(Exception e)
             {
-                Trace.TraceInformation("Failed to parse GPX file {0} for unformattedRoute: {1}", e.ToString(), route.Id);
+                Trace.TraceError("Failed to parse GPX file {0} for unformattedRoute: {1}", e.ToString(), route.Id);
                 return null;
             }
         }
@@ -70,7 +84,7 @@ namespace MediaConverter.Converters
 
             foreach (var point in points)
             {
-                Trace.TraceInformation("Converting point {0} ", point);
+                Trace.TraceError("Converting point {0} ", point);
 
                 var data = point.Split(' ');
 
@@ -94,7 +108,7 @@ namespace MediaConverter.Converters
 
             foreach (var point in gpxRoute.trk.trkseg)
             {
-                Trace.TraceInformation("Converting GPX point {0} ", point);
+                Trace.TraceError("Converting GPX point {0} ", point);
 
                 double latitude = Convert.ToDouble(point.lat);
                 double longitutde = Convert.ToDouble(point.lon);
@@ -105,7 +119,6 @@ namespace MediaConverter.Converters
                     latitude = latitude,
                     longitude = longitutde
                 });
-
             }
 
             return route;
@@ -116,6 +129,7 @@ namespace MediaConverter.Converters
             string url = string.Format("https://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&key={2}", latitude,longitutde,APIKey);
             string result = String.Empty;
 
+            Trace.TraceError("Getting data from Google Geocodie GPX point");
             using (WebClient wc = new WebClient())
             {
                 result = wc.DownloadString(url);
@@ -132,7 +146,7 @@ namespace MediaConverter.Converters
             }
             catch(Exception)
             {
-                Trace.TraceInformation("GoogleMaps Revert Geocoding exception");
+                Trace.TraceError("GoogleMaps Revert Geocoding exception");
             }
 
             return result;
