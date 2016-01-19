@@ -32,7 +32,7 @@ namespace MyTrip.MyTripLogic.Controllers
 
         [HttpPost]
         [Route("addPhoto")]
-        public async Task<IHttpActionResult> addPhoto([FromUri] string id, [FromUri] string tripId)
+        public async Task<IHttpActionResult> addPhoto([FromUri] string tripId)
         {
 
             string sPath = "";
@@ -46,7 +46,10 @@ namespace MyTrip.MyTripLogic.Controllers
 
                 if (hpf.ContentLength > 0)
                 {
-                    await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id, hpf.InputStream);
+                    string id = Guid.NewGuid().ToString();
+                    var document = await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id);
+                    _repo.CreatePhotoInBlob(id, hpf.InputStream);
+
                     QueueMessage qm = new QueueMessage();
                     qm.tripId = tripId;
                     qm.taskType = QueueTaskType.ConvertPhoto;

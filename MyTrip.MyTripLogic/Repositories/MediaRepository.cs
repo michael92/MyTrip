@@ -25,7 +25,7 @@ namespace MyTrip.MyTripLogic.Repositories
         }
 
 
-        public async Task CreatePhoto(string id, string url, string tripId, string thumbnailUrl, Stream inputStream)
+        public async Task<Document> CreatePhoto(string id, string url, string tripId, string thumbnailUrl)
         {
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
             Media m = new Media();
@@ -36,19 +36,21 @@ namespace MyTrip.MyTripLogic.Repositories
             m.Status = MediaStatus.Formatting;
             DocumentClient dc = photodb.Client;
 
-            var doc = await dc.CreateDocumentAsync(photodb.Collection.SelfLink, m);
+            return await dc.CreateDocumentAsync(photodb.Collection.SelfLink, m);
+        }
 
+        public void CreatePhotoInBlob(string id, Stream inputStream)
+        {
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("photo");
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(""+id);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
             blockBlob.UploadFromStream(inputStream);
         }
 
-        public async Task CreateMovie(string id, string url, string tripId, string thumbnailUrl, Stream inputStream)
+        public async Task CreateMovie(string url, string tripId, string thumbnailUrl, Stream inputStream)
         {
             DocumentDb moviedb = new DocumentDb("MyTripDb", "movie");
             Media m = new Media();
-            m.Id = id;
             m.Url = url;
             m.TripId = tripId;
             m.ThumbnailUrl = thumbnailUrl;
@@ -59,7 +61,7 @@ namespace MyTrip.MyTripLogic.Repositories
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("movie");
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference("" + id);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(doc.Resource.Id);
             blockBlob.UploadFromStream(inputStream);
         }
 
