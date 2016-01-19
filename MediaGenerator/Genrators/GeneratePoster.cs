@@ -20,7 +20,7 @@ namespace MediaGenerator.Generators
 {
     public class GeneratePoster : IGenerate
     {
-        public static string APIKey = "AIzaSyClxzgq0eDl9kteGNujCgTNljSIN0JyPps";
+        public static string APIKey = "AIzaSyC0sQ1pLDtQM7atcDpfJfmjD2TWLYf-jn0";
         public static string mapGoogle = @"http://maps.googleapis.com/maps/api/staticmap?";
 
         public void GenerateData(QueueMessage msg)

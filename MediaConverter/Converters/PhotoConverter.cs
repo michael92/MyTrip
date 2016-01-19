@@ -22,7 +22,7 @@ namespace MediaConverter.Converters
 
             var photo = photoDBClient.CreateDocumentQuery<Media>(photodb.Collection.DocumentsLink)
                 .AsEnumerable()
-                .Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl)
+                .Where(t => t.TripId == msg.tripId && t.Url == t.ThumbnailUrl)
                 .FirstOrDefault();
 
             photo.ThumbnailUrl = "https://filmsphotos.blob.core.windows.net/photo/thumbnail-" + photo.Id + ".png";
