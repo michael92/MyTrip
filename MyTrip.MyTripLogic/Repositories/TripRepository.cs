@@ -74,6 +74,10 @@ namespace MyTrip.MyTripLogic.Repositories
             Document doc = tripDb.GetDocument(id);
             var client = tripDb.Client;
             client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
+
+            // Changed Trip Data - Delete Poster
+            var mediaRepo = new MediaRepository();
+            mediaRepo.DeletePoster(id);
         }
 
         public void EditRoute(string id, Route route)
@@ -92,6 +96,10 @@ namespace MyTrip.MyTripLogic.Repositories
             Document doc = tripDb.GetDocument(id);
             var client = tripDb.Client;
             client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
+
+            // Changed Trip Data - Delete Poster
+            var mediaRepo = new MediaRepository();
+            mediaRepo.DeletePoster(id);
         }
 
         public async Task<Poster> GetPosterByTripId(string tripId)
@@ -136,7 +144,7 @@ namespace MyTrip.MyTripLogic.Repositories
             qm.taskType = QueueTaskType.GeneratePoster;
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
             CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-            CloudQueue queue = queueClient.GetQueueReference("posterQueue");
+            CloudQueue queue = queueClient.GetQueueReference("generate");
             queue.CreateIfNotExists();
             CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
             queue.AddMessage(message);

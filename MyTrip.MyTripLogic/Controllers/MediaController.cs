@@ -50,7 +50,10 @@ namespace MyTrip.MyTripLogic.Controllers
                     var document = await _repo.CreatePhoto(id, "https://filmsphotos.blob.core.windows.net/photo/" + id, tripId, "https://filmsphotos.blob.core.windows.net/photo/" + id);
                     _repo.CreatePhotoInBlob(id, hpf.InputStream);
                     _repo.SendPhotoToQueue(id, tripId);
-                    
+
+                    // Changed Trip Data - Delete Poster
+                    _repo.DeletePoster(tripId);
+
                     return Ok(id);
                 }
             }
@@ -81,7 +84,10 @@ namespace MyTrip.MyTripLogic.Controllers
                         var document = await _repo.CreateMovie(id, "https://filmsphotos.blob.core.windows.net/movie/" + id, tripId, "https://filmsphotos.blob.core.windows.net/movie/" + id);
                         _repo.CreateMovieInBlob(id, hpf.InputStream);
                         _repo.SendMovieToQueue(id, tripId);
-                        
+
+                        // Changed Trip Data - Delete Poster
+                        _repo.DeletePoster(tripId);
+
                         return Ok(id);
                     }
                 }
