@@ -8,12 +8,14 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text;
 
 namespace MediaConverter.Converters
 {
     public class RouteConverter : IConverter
     {
         public static string APIKey = "AIzaSyC0sQ1pLDtQM7atcDpfJfmjD2TWLYf-jn0";
+
         public void ConvertData(QueueMessage msg)
         {
             Trace.TraceError("Connecting to documentdb unformattedroute ");
@@ -131,6 +133,7 @@ namespace MediaConverter.Converters
             Trace.TraceError("Getting data from Google Geocodie GPX point");
             using (WebClient wc = new WebClient())
             {
+                wc.Encoding = Encoding.UTF8;                
                 result = wc.DownloadString(url);
             }            
 
