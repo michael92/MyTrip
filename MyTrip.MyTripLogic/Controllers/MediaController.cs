@@ -60,7 +60,7 @@ namespace MyTrip.MyTripLogic.Controllers
                     queue.CreateIfNotExists();
                     CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
                     queue.AddMessage(message);
-                    return Ok();
+                    return Ok(id);
                 }
             }
 
@@ -69,7 +69,7 @@ namespace MyTrip.MyTripLogic.Controllers
 
         [HttpPost]
         [Route("addMovie")]
-        public async Task<IHttpActionResult> addMovie([FromUri] string id, [FromUri] string tripId)
+        public async Task<IHttpActionResult> addMovie([FromUri] string tripId)
         {
 
             string sPath = "";
@@ -86,7 +86,10 @@ namespace MyTrip.MyTripLogic.Controllers
 
                     if (hpf.ContentLength > 0)
                     {
-                        await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id, hpf.InputStream);
+                        string id = Guid.NewGuid().ToString();
+                        var document = await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id);
+                        _repo.CreateMovieInBlob(id, hpf.InputStream);
+
                         QueueMessage qm = new QueueMessage();
                         qm.tripId = tripId;
                         qm.taskType = QueueTaskType.ConvertMovie;
@@ -97,7 +100,7 @@ namespace MyTrip.MyTripLogic.Controllers
                         queue.CreateIfNotExists();
                         CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
                         queue.AddMessage(message);
-                        return Ok();
+                        return Ok(id);
                     }
                 }
             }

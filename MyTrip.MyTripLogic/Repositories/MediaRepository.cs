@@ -47,21 +47,25 @@ namespace MyTrip.MyTripLogic.Repositories
             blockBlob.UploadFromStream(inputStream);
         }
 
-        public async Task CreateMovie(string id, string url, string tripId, string thumbnailUrl, Stream inputStream)
+        public async Task<Document> CreateMovie(string id, string url, string tripId, string thumbnailUrl)
         {
             DocumentDb moviedb = new DocumentDb("MyTripDb", "movie");
             Media m = new Media();
+            m.Id = id;
             m.Url = url;
             m.TripId = tripId;
             m.ThumbnailUrl = thumbnailUrl;
             m.Status = MediaStatus.Formatting;
             DocumentClient dc = moviedb.Client;
 
-            var doc = await dc.CreateDocumentAsync(moviedb.Collection.SelfLink, m);
+            return await dc.CreateDocumentAsync(moviedb.Collection.SelfLink, m);
+        }
 
+        public void CreateMovieInBlob(string id, Stream inputStream)
+        {
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("movie");
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(doc.Resource.Id);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(id);
             blockBlob.UploadFromStream(inputStream);
         }
 
