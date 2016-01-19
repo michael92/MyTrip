@@ -54,7 +54,7 @@ namespace MyTrip.MyTripLogic.Repositories
             return result;
         }
 
-        public async void EditTrip(string id, string name, string description, bool? isPublic = null)
+        public void EditTrip(string id, string name, string description, bool? isPublic = null)
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
             DocumentClient dc = tripDb.Client;
@@ -69,9 +69,27 @@ namespace MyTrip.MyTripLogic.Repositories
                 trip.Description = description ?? trip.Description;
                 trip.IsPublic = isPublic ?? trip.IsPublic;
             }
-            Document doc = tripDb.GetDocumentById(id);
+            Document doc = tripDb.GetDocument(id);
             var client = tripDb.Client;
-            await client.ReplaceDocumentAsync(doc.SelfLink, trip);
+            client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
+        }
+
+        public void EditRoute(string id, Route route)
+        {
+            DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
+            DocumentClient dc = tripDb.Client;
+            var trip = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == id)
+                .FirstOrDefault();
+
+            if (trip != null)
+            {
+                trip.Route = route;
+            }
+            Document doc = tripDb.GetDocument(id);
+            var client = tripDb.Client;
+            client.ReplaceDocumentAsync(doc.SelfLink, trip).Wait();
         }
 
     }
