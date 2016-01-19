@@ -49,17 +49,8 @@ namespace MyTrip.MyTripLogic.Controllers
                     string id = Guid.NewGuid().ToString();
                     var document = await _repo.CreatePhoto(id, "https://mytripblob.blob.core.windows.net/photo/" + id, tripId, "https://mytripblob.blob.core.windows.net/photo/" + id);
                     _repo.CreatePhotoInBlob(id, hpf.InputStream);
-
-                    QueueMessage qm = new QueueMessage();
-                    qm.tripId = tripId;
-                    qm.taskType = QueueTaskType.ConvertPhoto;
-                    qm.url = "https://mytripblob.blob.core.windows.net/photo/" + id;
-                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
-                    CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-                    CloudQueue queue = queueClient.GetQueueReference("converter");
-                    queue.CreateIfNotExists();
-                    CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
-                    queue.AddMessage(message);
+                    _repo.SendPhotoToQueue(id, tripId);
+                    
                     return Ok(id);
                 }
             }
@@ -89,17 +80,8 @@ namespace MyTrip.MyTripLogic.Controllers
                         string id = Guid.NewGuid().ToString();
                         var document = await _repo.CreateMovie(id, "https://mytripblob.blob.core.windows.net/movie/" + id, tripId, "https://mytripblob.blob.core.windows.net/movie/" + id);
                         _repo.CreateMovieInBlob(id, hpf.InputStream);
-
-                        QueueMessage qm = new QueueMessage();
-                        qm.tripId = tripId;
-                        qm.taskType = QueueTaskType.ConvertMovie;
-                        qm.url = "https://mytripblob.blob.core.windows.net/movie/" + id;
-                        CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
-                        CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-                        CloudQueue queue = queueClient.GetQueueReference("converter");
-                        queue.CreateIfNotExists();
-                        CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
-                        queue.AddMessage(message);
+                        _repo.SendMovieToQueue(id, tripId);
+                        
                         return Ok(id);
                     }
                 }

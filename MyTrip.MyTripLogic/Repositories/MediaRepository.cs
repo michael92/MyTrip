@@ -12,6 +12,7 @@ using System.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.IO;
+using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace MyTrip.MyTripLogic.Repositories
 {
@@ -129,6 +130,34 @@ namespace MyTrip.MyTripLogic.Repositories
             CloudBlobContainer container = blobClient.GetContainerReference("movie");
             CloudBlockBlob blob = container.GetBlockBlobReference(movie.GetPropertyValue<String>("Url"));
             blob.DeleteIfExists();
+        }
+
+        public void SendPhotoToQueue(string photoId, string tripId)
+        {
+            QueueMessage qm = new QueueMessage();
+            qm.tripId = tripId;
+            qm.taskType = QueueTaskType.ConvertPhoto;
+            qm.url = "https://mytripblob.blob.core.windows.net/photo/" + photoId;
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+            CloudQueue queue = queueClient.GetQueueReference("converter");
+            queue.CreateIfNotExists();
+            CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
+            queue.AddMessage(message);
+        }
+
+        public void SendMovieToQueue(string movieId, string tripId)
+        {
+            QueueMessage qm = new QueueMessage();
+            qm.tripId = tripId;
+            qm.taskType = QueueTaskType.ConvertMovie;
+            qm.url = "https://mytripblob.blob.core.windows.net/movie/" + movieId;
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["QueueConnectionString"]);
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+            CloudQueue queue = queueClient.GetQueueReference("converter");
+            queue.CreateIfNotExists();
+            CloudQueueMessage message = QueueMessage.SerializeMessage(qm);
+            queue.AddMessage(message);
         }
 
     }
