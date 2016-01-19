@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -12,6 +13,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 
+
+
 namespace MediaGenerator.Generators
 {
     public class GeneratePoster : IGenerate
@@ -22,12 +25,18 @@ namespace MediaGenerator.Generators
         {
             DocumentDb tripdb = new DocumentDb("MyTripDb", "trip");
             DocumentClient tripDBClient = tripdb.Client;
-            var trip = tripDBClient.CreateDocumentQuery<Trip>(new Uri(tripdb.Collection.SelfLink)).Where(t => t.Id == msg.tripId).FirstOrDefault();
-
+            Trip trip = tripDBClient.CreateDocumentQuery<Trip>(tripdb.Collection.DocumentsLink)
+                       .AsEnumerable()
+                       .Where(t => t.Id == msg.tripId)
+                       .FirstOrDefault();
+             
+            
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
             DocumentClient photoDBClient = photodb.Client;
-            var photos = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.Collection.SelfLink)).Where(t => t.Id == msg.tripId).ToList();
-
+            var photos = photoDBClient.CreateDocumentQuery<Media>(photodb.Collection.DocumentsLink)
+                       .AsEnumerable()
+                       .Where(t => t.Id == msg.tripId)
+                       .ToList();
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));
             CloudBlobClient blobClientDownload = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClientDownload.GetContainerReference("photo");
@@ -87,11 +96,11 @@ namespace MediaGenerator.Generators
             var point = "";
             for(int i=1;i<= r.points.Count;i++)
             {
-                point += @"markers=size:mid%7Ccolor:0xff0000%7Clabel:"+i+ "%7C"+r.points[i].city;
+                point += @"markers=size:mid%7Ccolor:0xff0000%7Clabel:"+i+ "%7C"+r.points[i].city + "&";
             }
             string url =
                mapGoogle
-               + @"scale =false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&"+ point +"&key=" + APIKey;
+               + @"scale =false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&"+ point +"key=" + APIKey;
             return "";
         }
     }
