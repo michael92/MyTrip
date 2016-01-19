@@ -94,5 +94,25 @@ namespace MyTrip.MyTripLogic.Repositories
 
             return movies;
         }
+
+        public async void DeletePhoto(string photoId)
+        {
+            DocumentDb tripDB = new DocumentDb("MyTripDb", "photo");
+            DocumentClient tripDBClient = tripDB.Client;
+
+            var photo = tripDBClient.CreateDocumentQuery<Document>(new Uri(tripDB.Collection.SelfLink))
+                .Where(t => t.Id == photoId)
+                .FirstOrDefault();
+            if (photo != null)
+            {
+                await tripDBClient.DeleteDocumentAsync(photo.SelfLink);
+            }
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference("photo");
+            CloudBlockBlob blob = container.GetBlockBlobReference(photo.GetPropertyValue<String>("Url"));
+            blob.DeleteIfExists();
+        }
+
     }
 }
