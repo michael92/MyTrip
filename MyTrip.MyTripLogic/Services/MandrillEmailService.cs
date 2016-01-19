@@ -49,13 +49,11 @@ namespace MyTrip.MyTripLogic.Services
 
         public async Task<bool> SendWelcomeEmail(string email, string username)
         {
-            var email = new EmailAddress(user.Email);
-
             var message = new EmailMessage
             {
                 FromEmail = "noreplay@mytrip.com",
                 Tags = new[] { "welcome" },
-                To = new[] { email }
+                To = new[] { new EmailAddress(email) }
             };
 
             message.AddGlobalVariable("username", username);

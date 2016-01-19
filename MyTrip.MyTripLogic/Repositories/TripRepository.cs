@@ -17,15 +17,30 @@ namespace MyTrip.MyTripLogic.Repositories
         {
             DocumentDb tripDb = new DocumentDb("MyTripDb", "trip");
             DocumentClient dc = tripDb.getClient();
-            var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+            if (isPublic)
+            {
+                var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
                 .AsEnumerable()
-                .Where(t => t.UserId == userId && t.IsPublic == isPublic)
+                .Where(t => t.IsPublic == isPublic)
                 .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
                 .OrderByDescending(t => t.Date)
                 .Skip(offset)
                 .Take(limit)
                 .ToList();
-            return result;
+                return result;
+            }
+            else
+            {
+                var result = dc.CreateDocumentQuery<Trip>(tripDb.getCollection().DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.UserId == userId)
+                .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
+                .OrderByDescending(t => t.Date)
+                .Skip(offset)
+                .Take(limit)
+                .ToList();
+                return result;
+            }
         }
 
         public Trip GetTrip(string id)
@@ -57,19 +72,6 @@ namespace MyTrip.MyTripLogic.Repositories
             Document doc = tripDb.GetDocumentById(id);
             var client = tripDb.getClient();
             await client.ReplaceDocumentAsync(doc.SelfLink, trip);
-        }
-
-        public IEnumerable<Media> GetPhotosAndMovies(string tripId)
-        {
-            // TODO: Poprawić na implementację jak wyżej
-            // Ta nie działa !!!
-            DocumentDb tripDb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient dc = tripDb.getClient();
-            var photos = dc.CreateDocumentQuery<Media>(new Uri(tripDb.getCollection().SelfLink)).Where(t => t.TripId == tripId);
-            tripDb = new DocumentDb("MyTripDb", "movie");
-            dc = tripDb.getClient();
-            var movies = dc.CreateDocumentQuery<Media>(new Uri(tripDb.getCollection().SelfLink)).Where(t => t.TripId == tripId);
-            return photos.Concat(movies);
         }
 
     }

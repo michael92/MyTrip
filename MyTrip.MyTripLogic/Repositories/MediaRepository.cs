@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using MyTrip.MyTripLogic.DB;
 using MyTrip.MyTripLogic.Models;
 using System;
@@ -15,10 +17,8 @@ namespace MyTrip.MyTripLogic.Repositories
 {
     public class MediaRepository
     {
-   
-
-
         private readonly CloudStorageAccount storageAccount;
+
         public MediaRepository()
         {
             storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["BlobConnectionString"]);
@@ -63,8 +63,30 @@ namespace MyTrip.MyTripLogic.Repositories
             blockBlob.UploadFromStream(inputStream);
         }
 
+        public IEnumerable<Media> GetPhotos(string tripId)
+        {
+            DocumentDb documentDb = new DocumentDb("MyTripDb", "photo");
+            DocumentClient dc = documentDb.getClient();
 
+            var photos = dc.CreateDocumentQuery<Media>(documentDb.getCollection().DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == tripId)
+                .ToList();
 
+            return photos;
+        }
 
+        public IEnumerable<Media> GetMovies(string tripId)
+        {
+            DocumentDb documentDb = new DocumentDb("MyTripDb", "movie");
+            var dc = documentDb.getClient();
+
+            var movies = dc.CreateDocumentQuery<Media>(documentDb.getCollection().DocumentsLink)
+                .AsEnumerable()
+                .Where(t => t.Id == tripId)
+                .ToList();
+
+            return movies;
+        }
     }
 }
