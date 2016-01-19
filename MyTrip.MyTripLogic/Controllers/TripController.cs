@@ -10,6 +10,8 @@ using MyTrip.MyTripLogic.Models;
 using Microsoft.WindowsAzure.Storage;
 using System.Configuration;
 using Microsoft.WindowsAzure.Storage.Queue;
+using System.Net.Http.Formatting;
+using System.Web.Script.Serialization;
 
 namespace MyTrip.MyTripLogic.Controllers
 {
@@ -46,10 +48,20 @@ namespace MyTrip.MyTripLogic.Controllers
         }
 
         [Route("editRoute")]
-        public IHttpActionResult EditRoute([FromUri] string id, [FromUri] Route route)
+        public IHttpActionResult EditRoute([FromUri]string id, [FromBody]FormDataCollection formData)
         {
-            _repo.EditRoute(id, route);
-            return Ok();
+            var route = formData["route"];
+            Route routeObj = null;
+            if (route != null)
+            {
+                routeObj = new JavaScriptSerializer().Deserialize<Route>(route);
+                _repo.EditRoute(id, routeObj);
+                return Ok();
+            }
+            else
+            {
+                return InternalServerError(new Exception("Invalid body. Parameter route is required."));
+            }
         }
 
         [Route("generatePoster")]
