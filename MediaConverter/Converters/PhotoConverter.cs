@@ -17,26 +17,37 @@ namespace MediaConverter.Converters
         public void ConvertData(QueueMessage msg)
         {
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
-            DocumentClient dc = photodb.getClient();
-            var photo = DocumentDb.GetMedia(msg.routeId).FirstOrDefault();
-            MemoryStream memoryStream = new MemoryStream();
+            DocumentClient photoDBClient = photodb.getClient();
+
+            var photo = photoDBClient.CreateDocumentQuery<Media>(new Uri(photodb.getCollection().SelfLink)).Where(t => t.Id == msg.tripId && t.Url == t.ThumbnailUrl).FirstOrDefault();
+            photo.ThumbnailUrl = "https://mytripblob.blob.core.windows.net/photo/thumbnail-" + photo.Id + ".png";
+            photo.Url = "https://mytripblob.blob.core.windows.net/photo/" + photo.Id + ".png";
+            photo.Status = MediaStatus.Formatted;
+
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference("photo");
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(photo.Id);
-            blockBlob.DownloadToStream(memoryStream);
+            CloudBlobClient blobClientDownload = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClientDownload.GetContainerReference("photo");
+            CloudBlockBlob blockBlobDownload = container.GetBlockBlobReference(photo.Id);
 
-            Image fullsizeImage = Image.FromStream(memoryStream);
-            Image newImage = fullsizeImage.GetThumbnailImage(200, 200, null, IntPtr.Zero);
-            MemoryStream myResult = new MemoryStream();
-            newImage.Save(myResult, ImageFormat.Jpeg);
+            MemoryStream memoryStream = new MemoryStream();
+            blockBlobDownload.DownloadToStream(memoryStream);
 
 
-            CloudBlockBlob blockBlob2 = container.GetBlockBlobReference("thumbnail-" + photo.Id);
-            blockBlob2.UploadFromByteArray(myResult.ToArray(), 0, (int)myResult.Length);
-            photo.ThumbnailUrl = "https://mytripblob.blob.core.windows.net/photo/thumbnail-" + photo.Id;
-            photo.Status= MediaStatus.Formatted;
-            DocumentDb.UpdateItemAsync(photo);
+            Image newImage = Image.FromStream(memoryStream);
+            MemoryStream image = new MemoryStream();
+            newImage.Save(image, ImageFormat.Png);
+            CloudBlockBlob blockBlobUpload = container.GetBlockBlobReference(photo.Id + ".png");
+            blockBlobUpload.UploadFromByteArray(image.ToArray(), 0, (int)image.Length);
+
+            Image newThumbnailImage = newImage.GetThumbnailImage(200, 200, null, IntPtr.Zero);
+            MemoryStream thumb = new MemoryStream();
+            newThumbnailImage.Save(thumb, ImageFormat.Png);
+            CloudBlockBlob blockBlobUploadThumb = container.GetBlockBlobReference("thumbnail-" + photo.Id + ".png");
+            blockBlobUploadThumb.UploadFromByteArray(thumb.ToArray(), 0, (int)thumb.Length);
+
+
+
+            photoDBClient.ReplaceDocumentAsync(new Uri(photodb.getCollection().SelfLink), photo);
         }
 
     }
