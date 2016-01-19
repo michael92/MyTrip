@@ -47,7 +47,7 @@ namespace MyTrip.MyTripLogic.Repositories
             blockBlob.UploadFromStream(inputStream);
         }
 
-        public async Task CreateMovie(string url, string tripId, string thumbnailUrl, Stream inputStream)
+        public async Task CreateMovie(string id, string url, string tripId, string thumbnailUrl, Stream inputStream)
         {
             DocumentDb moviedb = new DocumentDb("MyTripDb", "movie");
             Media m = new Media();
