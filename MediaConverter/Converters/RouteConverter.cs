@@ -44,7 +44,6 @@ namespace MediaConverter.Converters
 
                     if (gpx != null)
                     {
-                        Trace.TraceInformation("GPX route format {0})}", msg.routeId);
                         route = this.ParseGpxRoute(gpx,unfroute);
                     }
                     else
