@@ -21,7 +21,7 @@ namespace MyTrip.MyTripLogic.Repositories
             {
                 var result = dc.CreateDocumentQuery<Trip>(tripDb.Collection.DocumentsLink)
                 .AsEnumerable()
-                .Where(t => t.IsPublic == isPublic)
+                .Where(t => (t.IsPublic == isPublic && t.UserId != userId))
                 .Select(t => new Trip { Id = t.Id, Name = t.Name, Description = t.Description })
                 .OrderByDescending(t => t.Date)
                 .Skip(offset)
