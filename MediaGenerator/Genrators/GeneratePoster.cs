@@ -27,19 +27,21 @@ namespace MediaGenerator.Generators
         {
             DocumentDb tripdb = new DocumentDb("MyTripDb", "trip");
             DocumentClient tripDBClient = tripdb.Client;
-            Trip trip = tripDBClient.CreateDocumentQuery<Trip>(tripdb.Collection.DocumentsLink)
-                       .AsEnumerable()
-                       .Where(t => t.Id == msg.tripId)
-                       .FirstOrDefault();
-
 
             DocumentDb photodb = new DocumentDb("MyTripDb", "photo");
             DocumentClient photoDBClient = photodb.Client;
 
+            Trip trip = tripDBClient.CreateDocumentQuery<Trip>(tripdb.Collection.DocumentsLink)
+                   .AsEnumerable()
+                   .Where(t => t.Id == msg.tripId)
+                   .FirstOrDefault();
+
+
             var photos = photoDBClient.CreateDocumentQuery<Media>(photodb.Collection.DocumentsLink)
                        .AsEnumerable()
-                       .Where(t => t.Id == msg.tripId)
+                       .Where(t => t.TripId == msg.tripId)
                        .ToList();
+
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("BlobConnectionString"));
             CloudBlobClient blobClientDownload = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClientDownload.GetContainerReference("photo");
@@ -61,32 +63,33 @@ namespace MediaGenerator.Generators
                     //mapa
                     g.DrawImage(mapImage, 0, 100, 650, 300);
                     //miniaturki
-                    for (int i = 1; i <= photos.Count; i++)
+                    for (int i = 0; i < photos.Count; i++)
                     {
                         CloudBlockBlob blockBlobDownload = container.GetBlockBlobReference("thumbnail-" + photos[i].Id + ".png");
                         MemoryStream memoryStream = new MemoryStream();
-                        Image thumbnails = Image.FromStream(memoryStream);
                         blockBlobDownload.DownloadToStream(memoryStream);
-                        g.DrawImage(thumbnails, 10 * i + (i - 1) * 150, 450, 150, 150);
+
+                        Image thumbnails = Image.FromStream(memoryStream);
+                        g.DrawImage(thumbnails, 10 + 10 * i + 150 * i, 450, 150, 150);
                     }
-                    
-                    DocumentDb posterdb = new DocumentDb("MyTripDb", "poster");
-                    DocumentClient posterDBClient = posterdb.Client;
+                }
+                DocumentDb posterdb = new DocumentDb("MyTripDb", "poster");
+                DocumentClient posterDBClient = posterdb.Client;
 
-                    var poster = posterDBClient.CreateDocumentQuery<Poster>(posterdb.Collection.DocumentsLink)
-                        .AsEnumerable()
-                        .Where(t => t.TripId == msg.tripId)
-                        .FirstOrDefault();
+                var poster = posterDBClient.CreateDocumentQuery<Poster>(posterdb.Collection.DocumentsLink)
+                    .AsEnumerable()
+                    .Where(t => t.TripId == msg.tripId)
+                    .FirstOrDefault();
 
-                    if (poster != null)
+                if (poster != null)
                     {
                         poster.CreationDate = DateTime.Now.ToLocalTime();
                         poster.PosterStatus = PosterStatus.Generated;
-                        poster.Url = "https://filmsphotos.blob.core.windows.net/photo/poster-" + poster.Id;
+                        poster.Url = "https://filmsphotos.blob.core.windows.net/photo/poster-" + poster.Id+".png";
 
                         MemoryStream memoryStreamPoster = new MemoryStream();
                         b.Save(memoryStreamPoster, System.Drawing.Imaging.ImageFormat.Png);
-                        CloudBlockBlob blockBlobUpload = container.GetBlockBlobReference("poster-" + poster.Id);
+                        CloudBlockBlob blockBlobUpload = container.GetBlockBlobReference("poster-" + poster.Id + ".png");
                         blockBlobUpload.UploadFromByteArray(memoryStreamPoster.ToArray(), 0, (int)memoryStreamPoster.Length);
 
                         Document doc = posterdb.GetDocument(poster.Id);
@@ -95,19 +98,21 @@ namespace MediaGenerator.Generators
                 }
             }
 
-        }
+        
 
         public string GenerateMap(Route r)
         {
             var point = "";
-            for (int i = 1; i <= r.points.Count; i++)
+            var path = "path=color:0xff0000ff|weight:" + r.points.Count;
+            for (int i = 0; i < r.points.Count; i++)
             {
-                point += @"markers=size:mid%7Ccolor:0xff0000%7Clabel:" + i + "%7C" + r.points[i].city + "&";
+                point += @"markers=size:mid%7Ccolor:0xff0000%7Clabel:" + (i + 1) + "%7C" + r.points[i].latitude + "," + r.points[i].longitude + "&";
+                path += "|" + r.points[i].latitude + "," + r.points[i].longitude;
+
             }
-            string url =
-               mapGoogle
-               + @"scale =false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&" + point + "key=" + APIKey;
-            return "";
+            string url = string.Format("{0}scale =false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&{1}{3}&key={2}", mapGoogle, point, APIKey, path);
+
+            return url;
         }
     }
 }
