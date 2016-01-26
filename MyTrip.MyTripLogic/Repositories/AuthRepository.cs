@@ -38,6 +38,11 @@ namespace MyTrip.MyTripLogic.Repositories
             if (existingUser != null)
                 return IdentityResult.Failed("User with this username already exists");
 
+            existingUser = await FindByEmail(registrationModel.Email);
+            if(existingUser != null)
+                return IdentityResult.Failed("User with this email already exists");
+
+
             var user = new MyTripUser()
             {
                 UserName = registrationModel.UserName,
