@@ -51,13 +51,13 @@ namespace MyTrip.MyTripLogic.Repositories
 
         public async Task<IdentityUser> FindUser(string userName)
         {
-            var user = await userStore.FindByNameAsync(userName);
+            var user = await manager.FindByNameAsync(userName);
             return user;
         }
 
         public async Task<IdentityUser> FindByEmail(string email)
         {
-            var user = await userStore.FindByEmailAsync(email);
+            var user = await manager.FindByEmailAsync(email);
             return user;
         }
 
