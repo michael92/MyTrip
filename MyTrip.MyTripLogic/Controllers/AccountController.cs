@@ -45,7 +45,10 @@ namespace MyTrip.MyTripLogic.Controllers
         [Route("PasswordResetEmail")]
         public async Task<IHttpActionResult> GetPasswordResetEmail(string email)
         {
-            var user = await _repo.FindByEmail(email);
+            var user = email.Contains("@") ? 
+                await _repo.FindByEmail(email) :
+                await _repo.FindUser(email);
+
             if (user == null)
                 return NotFound();
 
